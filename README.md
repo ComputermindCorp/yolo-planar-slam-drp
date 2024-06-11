@@ -14,13 +14,13 @@ https://www.renesas.com/jp/ja/products/microcontrollers-microprocessors/rz-mpus/
 
 ## Test video on TUM dataset (Grayscale)
 
-https://github.com/ComputermindCorp/yolo-planar-slam-drp/assets/5689250/8989c154-b05c-41e9-bc2c-549fd7ae34fd
+https://github.com/ComputermindCorp/yolo-planar-slam-drp/assets/5689250/d4742b5c-7fca-461d-af36-8582b0c80f35
 
 This video is the result of a run on 859 images with a resolution of 640 x 480 of the grayscale TUM data set.
 
 ## Test video on our dataset (include person / exclude person)
 
-https://github.com/ComputermindCorp/yolo-planar-slam-drp/assets/5689250/1894ac4f-ea4d-4a68-abfd-163d0c573f97
+https://github.com/ComputermindCorp/yolo-planar-slam-drp/assets/5689250/1a39b602-788d-4e9e-9f0c-fc2a1e72a2db
 
 This video is the result of the data captured by the USB camera "ELP-USBGS720P02-L36".<br>
 By excluding moving objects (persons) from the feature points, tracking accuracy can be improved and loop closings are made smoother.
