@@ -1,0 +1,249 @@
+stages:
+  - lint
+  - build
+  - exec
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - when: always
+
+lint-clang-format:
+  stage: lint
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
+  script:
+    - find include src *_modules Examples CAPEAddition g2oAddition -name "*.h" -o -name "*.hpp" -o -name "*.c" -o -name "*.cc" -o -name "*.cpp" | xargs clang-format -i
+    - git diff --name-only
+    - diff_file_n=`git diff --name-only | wc -l`
+    - test 0 -eq $diff_file_n
+  only:
+    refs:
+      - branches
+      - merge_request
+  tags:
+    - ubuntu1804
+    - x86_64
+    - shell
+
+build-yolo-planar-slam-000-job:
+  stage: build
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
+  script:
+    - source /yocto_rzv2x_alpha2_workdir/bsp_sdk/environment-setup-aarch64-poky-linux
+    - source script/setup.sh
+    - MEASURE_TIME=OFF DUMP=OFF SLAMFAST=OFF TVM=OFF ./build.sh
+
+  tags:
+    - ubuntu1804
+    - x86_64
+    - docker
+
+build-yolo-planar-slam-100-job:
+  stage: build
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
+  script:
+    - source /yocto_rzv2x_alpha2_workdir/bsp_sdk/environment-setup-aarch64-poky-linux
+    - source script/setup.sh
+    - MEASURE_TIME=ON DUMP=OFF SLAMFAST=OFF TVM=OFF ./build.sh
+
+  tags:
+    - ubuntu1804
+    - x86_64
+    - docker
+
+build-yolo-planar-slam-010-job:
+  stage: build
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
+  script:
+    - source /yocto_rzv2x_alpha2_workdir/bsp_sdk/environment-setup-aarch64-poky-linux
+    - source script/setup.sh
+    - MEASURE_TIME=OFF DUMP=ON SLAMFAST=OFF TVM=OFF ./build.sh
+
+  tags:
+    - ubuntu1804
+    - x86_64
+    - docker
+
+
+build-yolo-planar-slam-001-job:
+  stage: build
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
+  script:
+    - source /yocto_rzv2x_alpha2_workdir/bsp_sdk/environment-setup-aarch64-poky-linux
+    - source script/setup.sh
+    - MEASURE_TIME=OFF DUMP=OFF SLAMFAST=ON TVM=OFF ./build.sh
+
+  tags:
+    - ubuntu1804
+    - x86_64
+    - docker
+
+build-yolo-planar-slam-101-job:
+  stage: build
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
+  script:
+    - source /yocto_rzv2x_alpha2_workdir/bsp_sdk/environment-setup-aarch64-poky-linux
+    - source script/setup.sh
+    - MEASURE_TIME=ON DUMP=OFF SLAMFAST=ON TVM=OFF ./build.sh
+
+  tags:
+    - ubuntu1804
+    - x86_64
+    - docker
+
+build-yolo-planar-slam-011-job:
+  stage: build
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
+  script:
+    - source /yocto_rzv2x_alpha2_workdir/bsp_sdk/environment-setup-aarch64-poky-linux
+    - source script/setup.sh
+    - MEASURE_TIME=OFF DUMP=ON SLAMFAST=ON TVM=OFF ./build.sh
+
+  tags:
+    - ubuntu1804
+    - x86_64
+    - docker
+
+build-c89-fast:
+  stage: build
+  script:
+    - cd drp/fast
+    - make -f Makefile.c89 -j4
+  only:
+    refs:
+      - branches
+      - merge_request
+  tags:
+    - ubuntu1804
+    - x86_64
+    - shell
+
+build-conv-fast:
+  stage: build
+  script:
+    - cd drp/fast
+    - make -f Makefile.conv -j4
+  only:
+    refs:
+      - branches
+      - merge_request
+  tags:
+    - ubuntu1804
+    - x86_64
+    - shell
+
+build-board-fast:
+  stage: build
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
+  script:
+    - cd drp/util/AIPoC2N/lib
+    - make
+    - cd ../../../../
+    - cd drp/util/AIPoC2N
+    - make -f Makefile.board -j4
+    - cd ../../../
+    - cd drp/fast
+    - make -f Makefile.board -j4
+  only:
+    refs:
+      - branches
+      - merge_request
+  tags:
+    - ubuntu1804
+    - x86_64
+    - shell
+
+build-drp-fast:
+  stage: build
+  script:
+    - export PATH=`pwd`/script/drp:$PATH
+    - cd drp/fast
+    - export IP_CORE="STP4C"
+    - export YPLACE_OPTIONS="-yplace_opt --disperse_level=12"
+    - OPT_CRITICAL_PATH=ON WS_NAME=fast MULTI_STATE=OFF drp_build_impl.sh
+  artifacts:
+    paths:
+      - drp/fast/musketeer_fast/
+    expire_in: 1 week
+  only:
+    changes:
+      - drp/fast/fast_drp.c
+    refs:
+      - merge_request
+  tags:
+    - ubuntu1804
+    - x86_64
+    - shell
+
+exec-drp-fast:
+  stage: exec
+  script:
+    - export PATH=`pwd`/script/drp:$PATH
+    - cd drp/fast
+    - export IP_CORE="STP4C"
+    - export IN_DIR=..
+    - export RESULT_DIR=.
+    - export WS_NAME=fast
+    - echo "Evaluation of Yolo-Planar-SLAM"
+    - export TESTBENCH_PATH=testbench/yolo-planar-slam/fast_0004_0
+    - export REF=exp
+    - drp_csim_impl.sh
+    - MODE=csim drp_verify_impl.sh
+    - drp_sim_impl.sh
+    - MODE=sim drp_verify_impl.sh
+    - echo "Evaluation of Crowd-SLAM"
+    - export TESTBENCH_PATH=testbench/crowd-slam/fast_0004_0
+    - export REF=exp
+    - drp_csim_impl.sh
+    - MODE=csim drp_verify_impl.sh
+    - drp_sim_impl.sh
+    - MODE=sim drp_verify_impl.sh
+  dependencies:
+    - build-drp-fast
+  only:
+    changes:
+      - drp/fast/fast_drp.c
+    refs:
+      - merge_request
+  tags:
+    - ubuntu1804
+    - x86_64
+    - shell
+
+verify-drp-fast:
+  stage: exec
+  script:
+    - export PATH=`pwd`/script/drp:$PATH
+    - cd drp/fast
+    - export IP_CORE="STP4C"
+    - export IN_DIR=..
+    - export RESULT_DIR=.
+    - export WS_NAME=fast
+    - export MODE=csim
+    - export REF=exp
+    - TESTBENCH_PATH=testbench/orb-slam2/fast_2849_7 drp_csim_impl.sh
+    - TESTBENCH_PATH=testbench/orb-slam2/fast_2849_7 drp_verify_impl.sh
+    - TESTBENCH_PATH=testbench/orb-slam2/fast_0316_0 drp_csim_impl.sh
+    - TESTBENCH_PATH=testbench/orb-slam2/fast_0316_0 drp_verify_impl.sh
+    - TESTBENCH_PATH=testbench/orb-slam2/fast_0316_7 drp_csim_impl.sh
+    - TESTBENCH_PATH=testbench/orb-slam2/fast_0316_7 drp_verify_impl.sh
+  dependencies:
+    - build-drp-fast
+  only:
+    changes:
+      - drp/fast/fast_drp.c
+    refs:
+      - merge_request
+  tags:
+    - ubuntu1804
+    - x86_64
+    - shell
