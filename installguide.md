@@ -9,16 +9,20 @@ If you do not calibrate your camera, the accuracy may be reduced.
 ### Deliverables
 
 Refer the link below
-[Download Link](https://renesas-rz.github.io/rzv_ai_sdk/3.00/howto_build_aisdk_v2h.html)
+[Download Link](https://www.renesas.com/us/en/software-tool/rzv2h-ai-software-development-kit)
+
 
 Provided items from Renesas are listed below
 
 #### RZ/V2H AI SDK
 | Category | File name | Download site / Description |
 | ---- | ---- | ---- |
-| RZ/V2H AI SDK Source Code | RTK0EF0180F03000SJ_linux-src.zip | https://www.renesas.com/us/en/document/sws/rzv2h-ai-sdk-v300-source-code |
+| RZ/V2H AI SDK Source Code | RTK0EF0180F05000SJ_linux-src.zip | https://www.renesas.com/us/en/document/sws/rzv2h-ai-sdk-v500-source-code |
 |   |  - README.txt | README file. | 
 |   |  - rzv2h_ai-sdk_yocto_recipe_v3.00.tar.gz | Yocto recipe.<br> Yocto recipes are text files that contains necessary information to build Yocto Linux.|
+| RZ/V2H AI SDK | RTK0EF0180F05000SJ.zip | https://www.renesas.com/us/en/document/sws/rzv2h-ai-sdk-v500 |
+|   |  - Dockerfile | Dockerfile for cross compile envirement | 
+|   |  - DRP-AI_Translator_i8-v1.00-Linux-x86_64-Install | AI Translator installer|
 
 ### EVALUATION ENVIRONMENT
 
@@ -27,17 +31,16 @@ Equipment and Software Necessary for Developing Environments as follows.
 | Equipment | Description |
 | ---- | ---- |
 | Target Board | RZ/V2H EVK |
-| Linux host PC | Build embedded Linux, Create microSD Card.<br><span style="color: red;">Ubuntu version 20.04 LTS</span> (64 bit OS must be used.)<br>100GB free space on HDD is necessary. |
+| Linux host PC | Build embedded Linux, Create microSD Card.<br><span style="color: red;">Ubuntu version 20.04 LTS (64 bit OS must be used.)</span><br>&emsp; - 100GB free space on HDD is necessary.<br>Recommended memory size<br>&emsp; - DDR memory 16GB and SWAP 32GB<br>&emsp; - DDR memory 32GB and SWAP 16GB<br>&emsp; - DDR memory 48GB and SWAP 2GB<br> |
 | Windows host PC | Communicate Target Board with terminal software.<br>Windows 10 is recommended. |
 | Terminal software | Used for controlling serial console of the target board<br>Tera Term (latest version) is recommended<br>Available at https://ttssh2.osdn.jp/index.html.en |
 | VCP Driver | Virtual COM Port driver which enables to communicate<br>Windows Host PC and the target board via USB<br>which is virtually used as serial port. <br>Available at: http://www.ftdichip.com/Drivers/VCP.htm<br>Please install VCP Driver corresponding to the target board. |
 | Broadband router | DHCP server |
-| microSD Card | <span style="color: red;">8GB or more</span>. Store Kernel image, device tree, rootfs |
+| SD Card | <span style="color: red;">32GB or more.</span> Store Kernel image, device tree, rootfs |
 | USB camera | ELP-USBGS720P02-L36<br>(Camera is not required when using Datasets.) |
 | USB power supply | Power supply |
 | USB Cable micro-B | Connect Win PC and Target board |
-| USB Cable Type-C<br><span style="color: red;">PD 100W / 5A</span> | Connect AC adapter and Target board<br><span style="color: red;">The board will not power on if the cable is less than 100W.</span> |
-| FFC Cable | Connect CPU board and EXP board |
+| USB Cable Type-C | Connect AC adapter and Target board<br><span style="color: red;">The board will not power on if the cable is less than 100W.</span> |
 
 <img src="./img/img1.png" width="60%">
  
@@ -57,7 +60,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   - (1) Download RZ/V2H AI SDK Source Code
   - (2) Deploy the files of RZ/V2H AI SDK and vslam
   - (3) Install the tools for building
-  - (4) Extract Yocto recipe package
+  - (4) Extract Yocto recipe and ai-vslam package
   - (5) Initialize a build using the 'oe-init-build-env' script in Poky
   - (6) Add layer Graphics Library, drpai, opencva, etc.
   - (7) Change the size of the microSD card image in WIC format
@@ -65,608 +68,1342 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   - (9) Add SLAM recipe
   - (10) Bitbake the Image
   - (11) BItbake the SDK
-  - (12) Install the SDK
-  - (13) Make application
-
-<br>
+  - (12) Setup SDK in Docker
+  - (13) CMake/Make application (Yolo-planar-slam)
+  - (14) CMake/Make application (Stella-vslam)
 
 - STEP2 Prepare a micro SD card to boot Linux<br>
   ![](./img/img4.png)
   
-  - (14) Prepare microSD
-  - (15) Write image to microSD
-  - (16) Write SLAM Script/Dataset/Application 
+  - (15) Prepare microSD
+  - (16) Write image to microSD
+  - (17) Write SLAM Script/Dataset/Application 
 
 <br>
 
 - STEP3 Execute DRP-AI sample application<br>
   ![](./img/img5.png)
 
-  - (17) Start EVK board and VSLAM application
-  - (18) Re-build AI-VSLAM application
+  - (18) Start EVK board and VSLAM application
+  - (19) Execute Yolo-planar-slam 
+  - (20) Re-build AI-VSLAM application
+  - (21) Execute Stella-vslam
+  - (22) Re-build AI-VSLAM application
 
 ### Build Instructions
 
 - (1) Download RZ/V2H AI SDK Source Code.
 
-  https://www.renesas.com/us/en/document/sws/rzv2h-ai-sdk-v300-source-code
-  <span style="color: black;">RTK0EF0180F03000SJ_linux-src.zip</span>
+  https://www.renesas.com/us/en/document/sws/rzv2h-ai-sdk-v500-source-code
+  <span style="color: black;">RTK0EF0180F05000SJ_linux-src.zip</span>
 
 - (2) Deploy the files of RZ/V2H AI SDK and vslam.
 
   Create a working directory(${WORK}/src_setup) at Linux Host PC and deploy these files in your work directory.
-  - Linux BSP			: <span style="color: black;"> RTK0EF0180F03000SJ_linux-src.zip </span>
+  - Linux BSP			: <span style="color: black;"> RTK0EF0180F05000SJ_linux-src.zip </span>
   - AI SLAM application and recipe		: <span style="color: black;"> yolo-planar-slam-drp </span>  
-  - AI SLAM dataset		: <span style="color: black;"> If using a dataset, see [Dataset preparation](datasetusage.md).
+  
+  Please deploy these file as follows. The name and the place of the working directory can be changed as necessary.
 
+  Run the following commands on your Linux PC.
   ```
-  $ export WORK="<working directory>"
-  $ mkdir -p ${WORK}/src_setup
-  $ cd ${WORK}/src_setup
-  $ unzip RTK0EF0180F03000SJ_linux-src.zip -d ${WORK}/src_setup
-  $ ls -1 ${WORK}/src_setup
-    README.txt
-    rzv2h_ai-sdk_yocto_recipe_v3.00.tar.gz
+  export WORK="<working directory>"
+  mkdir -p ${WORK}/src_setup
+  cd ${WORK}/src_setup
+  unzip RTK0EF0180F05000SJ_linux-src.zip -d ${WORK}/src_setup
+  ls -1 ${WORK}/src_setup
+  >>> README.txt
+      rzv2h_ai-sdk_yocto_recipe_v5.00.tar.gz
+  ```
+  
+  ```
+  cd ${WORK}/src_setup
+  git clone https://github.com/ComputermindCorp/yolo-planar-slam-drp.git
   ```
 
+- (3)-1 Install the tools for building.
+  
+  To install necessary software, run the following commands on your Linux PC.
+  
   ```
-  $ cd ${WORK}/src_setup
-  $ git clone https://github.com/ComputermindCorp/yolo-planar-slam-drp.git
+  sudo apt-get update
+  sudo apt-get install gawk wget git-core diffstat unzip texinfo gcc-multilib build-essential chrpath socat cpio python python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping libsdl1.2-dev xterm p7zip-full libyaml-dev libssl-dev   
   ```
 
-- (3) Install the tools for building.
+- (3)-2 Set the user name and email address before starting the build procedure. 
 
   Before starting the build, run the command below on the Linux Host PC to install packages used for building the BSP. <br>After that, Set git config (if it is NOT set).
 
   ```
-  $ sudo apt-get update 
-  $ sudo apt-get install gawk wget git-core diffstat unzip texinfo gcc-multilib build-essential chrpath socat cpio python python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping libsdl1.2-dev xterm p7zip-full libyaml-dev libssl-dev 
-  $ git config --global user.email “you@example.com”
-  $ git config --global user.name “Your Name”
+  sudo apt-get update 
+  sudo apt-get install gawk wget git-core diffstat unzip texinfo gcc-multilib build-essential chrpath socat cpio python python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping libsdl1.2-dev xterm p7zip-full libyaml-dev libssl-dev 
+  git config --global user.email “you@example.com”
+  git config --global user.name “Your Name”
   ```
 
-- (4) Extract Yocto recipe package.
-
+- (4)-1 Extract Yocto recipe package.
+  Run the following commands on your Linux PC.
   ```
-  $ export YOCTO_WORK=${WORK}/src_setup/yocto
-  $ mkdir -p ${YOCTO_WORK}
-  $ cd ${YOCTO_WORK}
-  $ tar zxvf ${WORK}/src_setup/rzv2h_ai-sdk_yocto_recipe_v3.00.tar.gz
+  export YOCTO_WORK=${WORK}/src_setup/yocto
+  mkdir -p ${YOCTO_WORK}
+  cd ${YOCTO_WORK}
+  tar zxvf ${WORK}/src_setup/rzv2h_ai-sdk_yocto_recipe_v5.00.tar.gz
+  ls -1 ${YOCTO_WORK}
+  >>> 0001-tesseract.patch
+      meta-gplv2
+      meta-openembedded
+      meta-renesas
+      meta-rz-features
+      meta-virtualization
+      poky
   ```
-
-  **Apply a patch file to fix lind error:**
-
-  Obtain the patch file below from [this Link](https://github.com/renesas-rz/rzv_ai_sdk/releases/download/v3.00/0001-recipes-debian-buster-glibc-Update-version-from-2.28.patch).
-
-  | File name | Description |
-  | ---- | ---- |
-  | 0001-recipes-debian-buster-glibc-Update-version-from-2.28.patch | patch file for fixing glibc link error |
-
-  Copy and apply the patch file.
-
+  
+- (4)-2 Extract ai-vslam package.
+  Run the following commands on your Linux PC.
   ```
-  $ cp <Path to the file>/0001-recipes-debian-buster-glibc-Update-version-from-2.28.patch ${YOCTO_WORK}
-  $ cd ${YOCTO_WORK}/meta-renesas
-  $ patch -p1 < ../0001-recipes-debian-buster-glibc-Update-version-from-2.28.patch
+  cd ${WORK}/src_setup/yolo-planar-slam-drp/src_files
+  cat yolo-planar-slam_* > yolo-planar-slam.tar.gz
+  cd ${YOCTO_WORK}  
+  tar zxvf ${WORK}/src_setup/yolo-planar-slam-drp/src_files/meta-stella-vslam.tar.gz
+  tar zxvf ${WORK}/src_setup/yolo-planar-slam-drp/src_files/stella_vslam_recursive.tar.gz
+  tar zxvf ${WORK}/src_setup/yolo-planar-slam-drp/src_files/yolo-planar-slam.tar.gz  
+  tar zxvf ${WORK}/src_setup/yolo-planar-slam-drp/src_files/yocto_ai_slam_guide.tar.gz  
+  tar zxvf ${WORK}/src_setup/yolo-planar-slam-drp/src_files/stella_vslam_examples.tar.gz
   ```
-
-  Check the working directory to confirm Yocto recipes content.
-
+  
+- (4)-3 Update configuration code of yolo-planar-slam. 
+  
+  Run the following commands on your Linux PC.
   ```
-  $ ls -1 ${YOCTO_WORK}
-    0001-recipes-debian-buster-glibc-Update-version-from-2.28.patch
-    0001-tesseract.patch
-    meta-gplv2
-    meta-openembedded
-    meta-renesas
-    meta-rz-features
-    meta-virtualization
-    poky
+  cp -r stella_vslam_examples/configuration_code yolo-planar-slam
   ```
 
-- (5) Initialize a build using the 'oe-init-build-env' script in Poky.
+- (5) Initialize a build using the 'oe-init-build-env' script in Poky. 
+  
+  Run the following commands on your Linux PC.
   ```
-  $ cd ${YOCTO_WORK}
-  $ TEMPLATECONF=${PWD}/meta-renesas/meta-rzv2h/docs/template/conf/ source poky/oe-init-build-env
+  cd ${YOCTO_WORK}
+  TEMPLATECONF=${PWD}/meta-renesas/meta-rzv2h/docs/template/conf/ source poky/oe-init-build-env
   ```
 
-- (6) Add layers of graphics Library, drpai, opencv accelerator, codecs and patch.
+- (6) Add layers of graphics Library, drpai, opencv accelerator, codecs and patch. 
+  
+  Run the following commands on your Linux PC.
+  ```
+  bitbake-layers add-layer ../meta-rz-features/meta-rz-graphics
+  bitbake-layers add-layer ../meta-rz-features/meta-rz-drpai
+  bitbake-layers add-layer ../meta-rz-features/meta-rz-opencva
+  bitbake-layers add-layer ../meta-rz-features/meta-rz-codecs
+  ```
 
   ```
-  $ bitbake-layers add-layer ../meta-rz-features/meta-rz-graphics
-  $ bitbake-layers add-layer ../meta-rz-features/meta-rz-drpai
-  $ bitbake-layers add-layer ../meta-rz-features/meta-rz-opencva
-  $ bitbake-layers add-layer ../meta-rz-features/meta-rz-codecs
-  $ bitbake-layers add-layer ../meta-openembedded/meta-filesystems
-  $ bitbake-layers add-layer ../meta-openembedded/meta-networking
-  $ bitbake-layers add-layer ../meta-virtualization
+  bitbake-layers add-layer ../meta-openembedded/meta-filesystems
+  bitbake-layers add-layer ../meta-openembedded/meta-networking
+  bitbake-layers add-layer ../meta-virtualization
+  ```
+  ※Note: It is different from AISDK.
 
-  $ patch -p1 < ../0001-tesseract.patch
+  ```  
+  patch -p1 < ../0001-tesseract.patch
   ```
 
 - (7) Change the size of the microSD card image in WIC format
 
-  The case of using 8GB microSD
-  ```
-  $ sed -i 's/1048576/3145728/g' conf/local.conf
-  $ egrep 3145728 conf/local.conf
-    IMAGE_ROOTFS_EXTRA_SPACE = "3145728"
-  ```
-  
-  The case of using 16GB microSD
-  ```
-  $ sed -i 's/1048576/8388608/g' conf/local.conf
-  $ egrep 8388608 conf/local.conf
-    IMAGE_ROOTFS_EXTRA_SPACE = "8388608"
-  ```
+  Run the following commands on your Linux PC.
 
   The case of using 32GB microSD
   ```
-  $ sed -i 's/1048576/16777216/g' conf/local.conf
-  $ egrep 16777216 conf/local.conf
-    IMAGE_ROOTFS_EXTRA_SPACE = "16777216"
+  sed -i 's/1048576/16777216/g' conf/local.conf
+  egrep 16777216 conf/local.conf
+  >>> IMAGE_ROOTFS_EXTRA_SPACE = "16777216"
   ```
 
-- (8) Build the target file system image using bitbake.
-
-  Run the commands below to start a build. Building an image can take up to a few hours depending on the user’s host system performance.
+  The case of using 16GB microSD
   ```
-  $ cd ${YOCTO_WORK}/build
-
-  $ MACHINE=rzv2h-evk-ver1 bitbake core-image-weston
+  sed -i 's/1048576/8388608/g' conf/local.conf
+  egrep 8388608 conf/local.conf
+  >>> IMAGE_ROOTFS_EXTRA_SPACE = "8388608"
   ```
-
-- (9) Add SLAM recipe
   
-  Unzip "meta-yolo-planar-slam-2.9.0.tar.gz" and link "meta-yolo-planar-slam-2.9.0"  to "meta-yolo-planar-slam".
+- (8) Build the target file system image using bitbake.
+  
+  Run the commands on your Linux PC below to start a build. Building an image can take up to a few hours depending on the user’s host system performance.
   ```
-  $ cd ${YOCTO_WORK}
-  $ tar zxvf ${WORK}/src_setup/yolo-planar-slam-drp/setup_files/meta-yolo-planar-slam-2.9.0.tar.gz
-  $ ln -s ./meta-yolo-planar-slam-2.9.0 ./meta-yolo-planar-slam
-  ```
-
-  Make sure the following linked files.
-  ```
-  $ ls -al meta-yolo-planar-slam
-    meta-yolo-planar-slam -> ./meta-yolo-planar-slam-2.9.0
+  cd ${YOCTO_WORK}/build
+  MACHINE=rzv2h-evk-ver1 bitbake core-image-weston
   ```
 
-  Insert the following text into "bblayers.conf" and "local.conf".
+- (9) Add SLAM recipe 
+  
+  Run the following commands on your Linux PC.
+
+  Initialize a build using the 'oe-init-build-env' script in Poky.
   ```
-  $ cd ${YOCTO_WORK}
-  $ sed -i '$i ${TOPDIR}/../meta-yolo-planar-slam \\' ./build/conf/bblayers.conf
-  $ sed -i '$a SDKIMAGE_FEATURES_append = " libopencv-dev " ' ./build/conf/local.conf
+  cd ${YOCTO_WORK}
+  TEMPLATECONF=${PWD}/meta-renesas/meta-rzv2h/docs/template/conf/ source poky/oe-init-build-env
   ```
 
-  Make sure you have inserted the following text in the "bblayers.conf".
+  Add SLAM recipe.
   ```
-  $ tail -2 ./build/conf/bblayers.conf
-    ${TOPDIR}/../meta-yolo-planar-slam \
-    "
-  ```
-
-  Make sure you have inserted the following text in the "local.conf".
-  ```
-  $ tail -1 ./build/conf/local.conf
-    SDKIMAGE_FEATURES_append = " libopencv-dev "
+  bitbake-layers add-layer ../meta-stella-vslam
+  bitbake-layers show-layers | egrep stella
+  >>> meta-stella-vslam<br>  {WORK}/src_setup/yocto/meta-stella-vslam  6  
   ```
 
-- (10) Build the target file system image using bitbake.
   ```
-  $ cd ${YOCTO_WORK}
-  $ TEMPLATECONF=${PWD}/meta-renesas/meta-rzv2/docs/template/conf/ source poky/oe-init-build-env
-  $ MACHINE=rzv2h-evk-ver1 bitbake core-image-weston
+  sed -i '$aWHITELIST_GPL-3.0 = " suitesparse-cxsparse suitesparse-config "' ./conf/local.conf
   ```
-  After completing the images for the target machine will be available in the output directory<br>
-  <span style="color: blue;"> ‘${YOCTO_WORK}/build/tmp/deploy/images/rzv2h-evk-ver1’.</span>
 
+  ```
+  egrep WHITELIST_GPL ./conf/local.conf
+  >>> WHITELIST_GPL-3.0 = " suitesparse-cxsparse suitesparse-config "
+  ```
+  
+
+- (10) Build the target file system image using bitbake. 
+
+  Run the following commands on your Linux PC.
+  ```
+  cd ${YOCTO_WORK}
+  TEMPLATECONF=${PWD}/meta-renesas/meta-rzv2/docs/template/conf/ source poky/oe-init-build-env
+  MACHINE=rzv2h-evk-ver1 bitbake core-image-weston 
+  ```
+  After completing the images for the target machine will be available in the output directory
+  ‘<span style="color: blue;">${YOCTO_WORK}/build/tmp/deploy/images/rzv2h-evk-ver1</span>’.
+  
   - <span style="color: red;">core-image-weston-rzv2h-evk-ver1.wic.bmap</span>
   - <span style="color: red;">core-image-weston-rzv2h-evk-ver1.wic.gz</span>
-
   
-  *The bitbake may occur errors due to lack of memory.*<br>
-  *In that case, reduce the number of cores by adding the following command to local.conf.*<br> 
-  *This is an example with 2 cores．*<br>
-  ![](./img/img7.png)
+  *The bitbake may occur errors due to lack of memory.<br>*
+  *In that case, reduce the number of cores by adding the following command to local.conf. This is an example with 2 cores．<br>* 
+  
+  *build/conf/local.conf<br>*
+  *BB_NUMBER_THREADS = '2'<br>*
+  *PARALLEL_MAKE = '-j 2'<br>*
 
 - (11) Build the target SDK
+
+  Run the following commands on your Linux PC.
   ```
-  $ cd ${YOCTO_WORK}
-  $ TEMPLATECONF=${PWD}/meta-renesas/meta-rzv2/docs/template/conf/ source poky/oe-init-build-env
-  $ MACHINE=rzv2h-evk-ver1 bitbake core-image-weston -c populate_sdk
-  ```
-  The resulting SDK installer will be located in <span style="color: blue;">'${YOCTO_WORK}/build/tmp/deploy/sdk'</span>.
-
-  <span style="color: red;">poky-glibc-x86_64-core-image-weston-aarch64-rzv2h-evk-ver1-toolchain-3.1.26.sh</span> : Cross compiler installer
-
-- (12) Install the SDK
-
-  To run the installer, you would execute the following command:<br>
-  The target directory name and place "/opt/poky/3.1.26" can be changed as necessary.<br>
-  In case of default name of install directory for SDK
-  ```
-  $ cd ${YOCTO_WORK}/build/tmp/deploy/sdk
-  $ sudo sh poky-glibc-x86_64-core-image-weston-aarch64-rzv2h-evk-ver1-toolchain-3.1.26.sh 
-
-  Poky (Yocto Project Reference Distro) SDK installer version 3.1.26
-  ==================================================================
-  Enter target directory for SDK (default: /opt/poky/3.1.26): <Press Enter>
-  You are about to install the SDK to "/opt/poky/3.1.26". Proceed [Y/n]?Y
+  cd ${YOCTO_WORK}
+  TEMPLATECONF=${PWD}/meta-renesas/meta-rzv2/docs/template/conf/ source poky/oe-init-build-env
+  MACHINE=rzv2h-evk-ver1 bitbake core-image-weston -c populate_sdk
   ```
 
-- (13) Make AI-VSLAM application
-
-  <span style="color: red;">Open new terminal.</span> link "yolo-planar-slam-drp"  to "yolo-planar-slam".
+  The resulting SDK installer will be located in '<span style="color: blue;">${YOCTO_WORK}/build/tmp/deploy/sdk'.</span>
+  
+  - <span style="color: red;">poky-glibc-x86_64-core-image-weston-aarch64-rzv2h-evk-ver1-toolchain-3.1.31.sh</span> : Cross compiler installer
+  
+- (12)-1 Register the working and setup directory path to an environment variable.
+  
+  Run the following commands on your Linux PC.
   ```
-  $ export WORK="<working directory>"
-  $ export YOCTO_WORK=${WORK}/src_setup/yocto
-  $ cd ${YOCTO_WORK}
-  $ ln -s ${WORK}/src_setup/yolo-planar-slam-drp ./yolo-planar-slam
+  export YOCTO_WORK=${WORK}/src_setup/yocto
+  export AI_SDK_WORK=${WORK}/ai_sdk_work
   ```
-  Make sure the following linked files.
+
+- (12)-2  Copy the script of make*.sh to ${YOCTO_WORK}/script directory.
+
+  Run the following commands on your Linux PC.
+
   ```
-  $ ls -al yolo-planar-slam
-    yolo-planar-slam -> "<working directory>"/src_setup/yolo-planar-slam-drp
+  cd ${YOCTO_WORK}
+  mkdir -p script
+  cp ${WORK}/src_setup/yolo-planar-slam-drp/setup_files/make*.sh ./script/
   ```
-  Link drp binaries.
+
+- (12)-3 Download RZ/V2H AI SDK and extract AI SDK.
+  
+  https://www.renesas.com/us/en/document/sws/rzv2h-ai-sdk-v500
+
+  RTK0EF0180F05000SJ.zip
+  
+  Run the following commands on your Linux PC.
   ```
-  $ cd ${YOCTO_WORK}/yolo-planar-slam/configuration_code
-  $ ln -fs gaussian_blur_drp_out.20230810_05.STP4C.bin gaussian_blur_drp_out.bin
-  $ ln -fs resize_drp_out.20230810_01.STP4C.bin resize_drp_out.bin
-  $ ln -fs orb_descriptors_drp_out.20230810_17.STP4C.bin orb_descriptors_drp_out.bin
-  $ ln -fs slamfast_drp_out.20230810_16.STP4C.bin slamfast_drp_out.bin
+  cd $WORK
+  mkdir -p ai_sdk_work
+  cd ${AI_SDK_WORK}
+  unzip RTK0EF0180F05000SJ.zip
   ```
-  Set the SDK environment and make the application.
+
   ```
-  $ cd ${YOCTO_WORK}
-  $ source /opt/poky/3.1.26/environment-setup-aarch64-poky-linux
-  $ source ./yolo-planar-slam/script/setup.sh
-
-  $ cd ${YOCTO_WORK}/yolo-planar-slam
-  $ mkdir -p build
-  $ cd ./build
-  $ cp ${WORK}/src_setup/yolo-planar-slam-drp/setup_files/make_yolo-planar-slam.sh .
-  $ . ./make_yolo-planar-slam.sh
+  cd ${AI_SDK_WORK}
+  ls
+  >>> ai_sdk_setup  board_setup  documents  r11an0840ej0500-rzv2h-ai-sdk.pdf  references
   ```
-  <img src="./img/img8.png" width="70%">
+  
+#### Make sure that you have installed Docker  on your Linux PC.
 
-## 2. Prepare SD card to boot Linux
-### Create a micro SD Card
-- (14) Prepare a microSD Card
-    
-  To boot from microSD Card, over <span style="color: red;">8GB</span> capacity of blank microSD card is needed,<br>
-  Please use Linux Host PC to write image data using USB card reader or other equipment.<br>
-  Please write image data to your microSD Card according to the following steps.
+- (12)-4 Move to the working directory and change to Cross Compiler installer builded by this Guide.
 
-- (15)  Write image to microSD card
+  Run the following commands on your Linux PC.
 
-  Here, we use "<span style="color: red;">/dev/sdc</span>" as microSD card device name.<br>
-  <span style="color: red;">"/dev/sdc" needs to be changed according to your environment of Ubuntu PC.</span>
-
-  Copy the image file to microSD
   ```
-  $ cd ${YOCTO_WORK}/build/tmp/deploy/images/rzv2h-evk-ver1/
-  $ sudo bmaptool copy --bmap core-image-weston-rzv2h-evk-ver1.wic.bmap core-image-weston-rzv2h-evk-ver1.wic.gz /dev/sdc
-  ``` 
-  Mount microSD Card. The name and the place of the mount directory can be changed as necessary. 
-  ``` 
-  $ export SD_VFAT="/media/<user-name>/3A98-31EA"
-  $ export SD_EXT4="/media/<user-name>/rootfs"
-  $ sudo mount -t vfat /dev/sdc1 $SD_VFAT
-  $ sudo mount -t ext4 /dev/sdc2 $SD_EXT4
-  ``` 
-
-- (16) - 1. Write files to the card
-
-  TUM dataset
-  ``` 
-  $ sudo mkdir -p $SD_EXT4/opt/dataset/tum
-
-  $ sudo cp -rp ${WORK}/dataset/GRAY_rgbd_dataset_freiburg3_walking_xyz $SD_EXT4/opt/dataset/tum/
-  $ sync
-
-  $ sudo cp -rp ${WORK}/dataset/rgbd_dataset_freiburg3_walking_xyz $SD_EXT4/opt/dataset/tum/
-  $ sync
-  ``` 
-
-
-- (16) - 2. Write files to the card
-  Slam execution file and viewer and so on
+  cd ${AI_SDK_WORK}/ai_sdk_setup
+  mv poky-glibc-x86_64-core-image-weston-aarch64-rzv2h-evk-ver1-toolchain-3.1.31.sh poky-glibc-x86_64-core-image-weston-aarch64-rzv2h-evk-ver1-toolchain-3.1.31.sh.org 
+  cp ${YOCTO_WORK}/build/tmp/deploy/sdk/poky-glibc-x86_64-core-image-weston-aarch64-rzv2h-evk-ver1-toolchain-3.1.31.sh .
   ```
-  $ cd ${WORK}/src_setup/yolo-planar-slam-drp/setup_files
-  $ tar zxvf ./YOLOX_S_dense_640x640_RGB_10271351.tar.gz -C  ${YOCTO_WORK}/yolo-planar-slam
-  $ cp ./run_setenv_slam.sh ${YOCTO_WORK}/yolo-planar-slam/script
-  ``` 
+
+- (12)-5 Build docker image and check docker images. 
   
   ```
-  $ cd ${YOCTO_WORK}/yolo-planar-slam
-  $ sudo mkdir -p $SD_EXT4/home/root/yolo-planar-slam/Vocabulary
-  $ sudo tar zxvf ./Vocabulary/ORBvoc.txt.tar.gz -C $SD_EXT4/home/root/yolo-planar-slam/Vocabulary
-  $ sudo cp -r YOLOX_S_dense_640x640_RGB_10271351 configuration_code viewer script $SD_EXT4/home/root/yolo-planar-slam
-  $ sync
-  $ sudo cp -r Examples build lib Thirdparty $SD_EXT4/home/root/yolo-planar-slam
-  $ sync
+  docker build -t rzv2h_ai_sdk_image:slam_2.12.3 --build-arg SDK="/opt/poky/3.1.31" --build-arg PRODUCT="V2H" .
+  docker images
+  ```
+  
+  |REPOSITORY|TAG|IMAGE ID|CREATED|SIZE|
+  |----|----|----|----|----|
+  |rzv2h_ai_sdk_image|slam_2.12.3|xxxxxxxxxxxx|About a minute ago| 25.2GB|
+  
+- (12)-6 Create docker container.
+  ```
+  cd ${AI_SDK_WORK}/ai_sdk_setup
+  docker run -it --name rzv2h_ai_sdk_container_slam_2.12.3 -v ${YOCTO_WORK}:/drp-ai_tvm/yocto rzv2h_ai_sdk_image:slam_2.12.3
+  ```  
+  
+  In docker container, run the following command to copy libtvm_runtime.so, which is the necessary file for the board and Cross Compiler environment. (12)-7
+  
+  Run the following commands in docker container
+  ```
+  export YOCTO_WORK="/drp-ai_tvm/yocto"
+  cp /drp-ai_tvm/obj/build_runtime/V2H/libtvm_runtime.so ${YOCTO_WORK:?}
+  cp /drp-ai_tvm/obj/build_runtime/V2H/libtvm_runtime.so /opt/poky/3.1.31/sysroots/aarch64-poky-linux/usr/lib64
+  exit
   ```
 
-  Unmount microSD Card 
+### Make Yolo-planar-slam
+In case of using TVM version skip (13-a).
+
+- (13-a) yolo-planar-slam using AI translator
+  
+- (13-a)-1 Start docker container. 
+
+  Run the following commands on your Linux PC.
   ```
-  $ sudo umount $SD_VFAT
-  $ sudo umount $SD_EXT4
+  cd ${AI_SDK_WORK}/ai_sdk_setup
+
+  docker start -i rzv2h_ai_sdk_container_slam_2.12.3
+  ```
+  
+- (13-a)-2 Setup the environment for building application. 
+
+  Run the following commands in docker container
+  ```
+  export YOCTO_WORK="/drp-ai_tvm/yocto"
+  cd ${YOCTO_WORK:?}/yolo-planar-slam
+  
+  source /opt/poky/3.1.31/environment-setup-aarch64-poky-linux
+  source script/setup.sh
+  ```
+  
+- (13-a)-3Make yolo-planar-slam using AI translator. 
+
+  Run the following commands in docker container  
+  ```
+  mkdir build
+  cd build
+  ```
+  
+  Change the make script depending on the DRP library. 
+  
+  OpenCVA or CPU : 
+  ```
+  cp ../../script/make_yolo-planar-slam-oca-trn.sh .
+  ./make_yolo-planar-slam-oca-trn.sh
+  ```
+
+  Custom:  
+  ```
+  cp ../../script/make_yolo-planar-slam-cus-trn.sh .
+  ./make_yolo-planar-slam-cus-trn.sh
+  ```
+
+  ```
+  exit
+  ```
+  ***In case of OpenCVA or CPU***
+
+  Options of make_yolo-planar-slam-oca-trn.sh
+  
+  cmake -DCMAKE_BUILD_TYPE=Release \
+    -DENABLE_MEASURE_TIME=ON \
+    -DENABLE_DUMP=OFF \
+    -DENABLE_DRP=ON \
+    -DENABLE_DRP_AI=ON \
+    -DENABLE_REALSENSE2=OFF \
+    -DENABLE_GOOGLE_PERF=OFF \
+    -DENABLE_YOCTO=ON \
+    -DENABLE_SLAMFAST=<span style="color: red;"> OFF</span> \
+    -DENABLE_DRPAI_EXPAND_MEMORY_SPACE=OFF \
+    -DENABLE_CALL_OPENCVA_DIRECTLY=ON \
+    -DOpenMP_C_FLAGS='-fopenmp' \
+    -DOpenMP_CXX_FLAGS='-fopenmp' \
+    -DOpenMP_C_LIB_NAMES='gomp;pthread' \
+    -DOpenMP_CXX_LIB_NAMES='gomp;pthread' \
+    
+    -DOpenMP_gomp_LIBRARY=${SDKTARGETSYSROOT}/usr/lib64/libgomp.so \
+
+    -DOpenMP_pthread_LIBRARY=${SDKTARGETSYSROOT}/usr/lib64/libpthread.so \
+    
+    -DYOLO_PLANAR_SLAM_VERSION=${YOLO_PLANAR_SLAM_VERSION} \
+    ..
+  make -j 
+
+  ***In case of Cudtom***
+
+  Options of make_yolo-planar-slam-cus-trn.sh
+
+  cmake -DCMAKE_BUILD_TYPE=Release \
+    -DENABLE_MEASURE_TIME=ON \
+    -DENABLE_DUMP=OFF \
+    -DENABLE_DRP=ON \
+    -DENABLE_DRP_AI=ON \
+    -DENABLE_REALSENSE2=OFF \
+    -DENABLE_GOOGLE_PERF=OFF \
+    -DENABLE_YOCTO=ON \
+    -DENABLE_SLAMFAST=<span style="color: red;">ON</span> \
+    -DENABLE_DRPAI_EXPAND_MEMORY_SPACE=OFF \
+    -DENABLE_CALL_OPENCVA_DIRECTLY=ON \
+    -DOpenMP_C_FLAGS='-fopenmp' \
+    -DOpenMP_CXX_FLAGS='-fopenmp' \
+    -DOpenMP_C_LIB_NAMES='gomp;pthread' \
+    -DOpenMP_CXX_LIB_NAMES='gomp;pthread' \
+    -DOpenMP_gomp_LIBRARY=${SDKTARGETSYSROOT}/usr/lib64/libgomp.so \
+    
+    -DOpenMP_pthread_LIBRARY=${SDKTARGETSYSROOT}/usr/lib64/libpthread.so \
+    
+    -DYOLO_PLANAR_SLAM_VERSION=${YOLO_PLANAR_SLAM_VERSION} \
+    ..
+  make -j
+
+In case of using AI translator version (13-b).
+- (13-b) yolo-planar-slam using TVM 
+
+- (13-b)-1 Start docker container. 
+
+  Run the following commands on your Linux PC.
+  ```
+  cd ${AI_SDK_WORK}/ai_sdk_setup
+  docker start -i rzv2h_ai_sdk_container_slam_2.12.3
+  ```
+
+- (13-b)-2 Setup the environment for building application. 
+
+  Run the following commands in docker container
+  ```
+  export YOCTO_WORK="/drp-ai_tvm/yocto"
+  cd ${YOCTO_WORK:?}/yolo-planar-slam
+  
+  source /opt/poky/3.1.31/environment-setup-aarch64-poky-linux
+  source script/setup.sh
+  ```
+
+- (13-b)-3 Add the include directories of TVM to the CMakeLists.txt. 
+
+  Run the following commands in docker container
+  ```
+  cat << 'EOS' | sed -i '121r /dev/stdin' ./CMakeLists.txt
+  >>> set(TVM_ROOT $ENV{TVM_HOME})
+      include_directories(
+      ${TVM_ROOT}/include
+      ${TVM_ROOT}/3rdparty/dlpack/include
+      ${TVM_ROOT}/3rdparty/dmlc-core/include
+      ${TVM_ROOT}/3rdparty/compiler-rt
+      )
+  
+      EOS
+  ```
+
+- (13-b)-4 Check the CMakeLists.txt. 
+  
+  Run the following commands in docker container
+  ```
+  egrep -A 8 -B 3 TVM_HOME CMakeLists.txt
+
+  >>> find_package(realsense2 REQUIRED)
+      endif()
+  
+      set(TVM_ROOT `$ENV{TVM_HOME})
+      include_directories(
+      ${TVM_ROOT}/include
+      ${TVM_ROOT}/3rdparty/dlpack/include
+      ${TVM_ROOT}/3rdparty/dmlc-core/include
+      ${TVM_ROOT}/3rdparty/compiler-rt
+      )
+  
+      include_directories(
+  ```
+
+- (13-b)-5 Make yolo-planar-slam using TVM.  
+  
+  Run the following commands in docker container
+  ```
+  mkdir build
+  cd build
+  ```
+
+  Change the make script depending on the DRP library. 
+  
+  OpenCVA or CPU :
+  ```
+  cp ../../script/make_yolo-planar-slam-oca-tvm.sh .
+  ./make_yolo-planar-slam-oca-tvm.sh
+  ```
+
+  Custom :
+  ```
+  cp ../../script/make_yolo-planar-slam-cus-tvm.sh  .
+  ./make_yolo-planar-slam-cus-tvm.sh 
+  ```
+
+  ```
+  exit
+  ```
+
+### Make Stella-vslam
+
+- (14) Make stella_vslam using TVM. 
+
+- (14)-1 Start docker container. 
+
+  Run the following commands on your Linux PC.
+  ```
+  cd ${AI_SDK_WORK}/ai_sdk_setup
+  docker start -i rzv2h_ai_sdk_container_slam_2.12.3
+  ```
+
+- (14)-2 Setup the environment for building application. 
+
+  Run the following commands in docker container
+  ```
+  export YOCTO_WORK="/drp-ai_tvm/yocto"
+  cd ${YOCTO_WORK:?}/stella_vslam
+
+  source /opt/poky/3.1.31/environment-setup-aarch64-poky-linux
+  source scripts/setup.sh
+  ```
+
+- (14)-3 Make a local directory. 
+
+  Run the following commands in docker container
+  ```
+  export CMAKE_INSTALL_PREFIX=${YOCTO_WORK:?}/local
+  mkdir -p ${CMAKE_INSTALL_PREFIX:?}
+  ```
+
+- (14)-4 Clone the repository of g2o. 
+
+  Run the following commands in docker container
+  ```
+  cd ${YOCTO_WORK:?}
+  
+  export G2O_COMMIT=20230223_git
+  git clone https://github.com/RainerKuemmerle/g2o.git
+  cd g2o
+  git checkout ${G2O_COMMIT}
+  ```
+
+- (14)-5 Build g2o and independent of OpenGL and then install. 
+
+  Run the following commands in docker container
+  ```
+  mkdir -p build
+  cd ./build
+  cp ../../script/make_g2o.sh .
+  ./make_g2o.sh
+  
+  cd ${YOCTO_WORK:?}/g2o/build
+  sed -i 's/find_dependency(OpenGL)/# find_dependency(OpenGL)/g' generated/g2oConfig.cmake
+  
+  make install
+  ```
+
+- (14)-6 Register as safe directories. 
+
+  Run the following commands in docker container
+  ```
+  cd ${YOCTO_WORK:?}/stella_vslam  
+  git config --global --add safe.directory /drp-ai_tvm/yocto/stella_vslam
+  git config --global --add safe.directory /drp-ai_tvm/yocto/stella_vslam/3rd/FBoW
+  git config --global --add safe.directory /drp-ai_tvm/yocto/stella_vslam/3rd/tinycolormap
+  git config --global --add safe.directory /drp-ai_tvm/yocto/stella_vslam/drp_cv_lib  
+  git submodule update --init
+  ```
+
+- (14)-7 Add the include directories of TVM to the CMakeLists.txt. 
+
+  Run the following commands in docker container
+  ```
+  cat << 'EOS' | sed -i '160r /dev/stdin' ./CMakeLists.txt
+  >>> set(TVM_ROOT $ENV{TVM_HOME})
+      include_directories(
+      ${TVM_ROOT}/include
+      ${TVM_ROOT}/3rdparty/dlpack/include
+      ${TVM_ROOT}/3rdparty/dmlc-core/include
+      ${TVM_ROOT}/3rdparty/compiler-rt
+      )
+  
+      EOS
+  ```
+
+- (14)-8 Check the CMakeLists.txt. 
+
+  Run the following commands in docker container
+  ```
+  egrep -A 8 -B 3 TVM_HOME CMakeLists.txt
+
+  >>> set(ARCHIVE_DESTINATION lib)
+      set(INCLUDES_DESTINATION include)
+  
+      set(TVM_ROOT $ENV{TVM_HOME})
+      include_directories(
+      ${TVM_ROOT}/include
+      ${TVM_ROOT}/3rdparty/dlpack/include
+      ${TVM_ROOT}/3rdparty/dmlc-core/include
+      ${TVM_ROOT}/3rdparty/compiler-rt
+      )
+  
+      ----- Build -----
+  ```
+
+- (14)-9 Build stella_vslam and install. 
+  
+  Run the following commands in docker container
+  ```
+  mkdir -p build
+  cd ./build
+  cp ../../script/make_stella-slam-tvm.sh .
+  ./make_stella-slam-tvm.sh
+  
+  make install
+  ```
+
+- (14)-10 Clone the repository of socket_publisher. 
+  
+  Run the following commands in docker container
+  ```
+  cd ${YOCTO_WORK:?}
+  
+  git clone https://github.com/stella-cv/socket_publisher.git -b 0.0.1
+  
+  cd ${YOCTO_WORK:?}/socket_publisher
+  ```
+
+- (14)-11 Add "SIOCLIENT_LIBRARY" to CMakeLists.txt. 
+  
+  Run the following commands in docker container
+  ```
+  sed -i 's/find_package(sioclient REQUIRED)/find_package(sioclient REQUIRED)\n# Change SIOCLIENT_LIBRARY for BitBake\nset(SIOCLIENT_LIBRARY "sioclient")\n/g' CMakeLists.txt
+  ```
+  
+- (14)-12 Add the include directories of EIGEN3 and OpenCV to the CMakeLists.txt. 
+
+  Run the following commands in docker container
+  ```
+  cat << 'EOS' | sed -i '61r /dev/stdin' ./CMakeLists.txt
+  >>> find_package(Eigen3 REQUIRED)
+      include_directories(${EIGEN3_INCLUDE_DIR})
+  
+      find_package(OpenCV REQUIRED)
+      include_directories(${OpenCV_INCLUDE_DIRS})
+  
+      EOS
+  ```
+
+- (14)-13 Check the CMakeLists.txt. 
+  
+  Run the following commands in docker container
+  ```
+  egrep -A 8 -B 3 "Eigen3" CMakeLists.txt
+
+  >>> PRIVATE 
+      "$ <BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>")
+
+      find_package(Eigen3 REQUIRED)
+      include_directories(${EIGEN3_INCLUDE_DIR})
+  
+      find_package(OpenCV REQUIRED)
+      include_directories(${OpenCV_INCLUDE_DIRS})
+  
+      target_link_libraries(socket_publisher
+          PUBLIC
+          stella_vslam::stella_vslam
+  ```
+
+- (14)-14 Build socket_publisher and install. 
+  
+  Run the following commands in docker container
+  ```
+  mkdir -p build
+  cd build
+  cp ../../script/make_socket_publisher.sh .
+  ./make_socket_publisher.sh
+  
+  make install
+  ```
+
+- (14)-15 Register as safe directories. 
+
+  Run the following commands in docker container
+  ```
+  cd ${YOCTO_WORK:?}/stella_vslam_examples
+  
+  git config --global --add safe.directory /drp-ai_tvm/yocto/stella_vslam_examples
+
+  git config --global --add safe.directory /drp-ai_tvm/yocto/stella_vslam_examples/3rd/filesystem
+  
+  git submodule update --init
+  ```
+
+- (14)-16 Add the include directories of TVM and EIGEN3 and OpenCV to the CMakeLists.txt. 
+
+  Run the following commands in docker container
+  ```
+  cat << 'EOS' | sed -i '17r /dev/stdin' ./CMakeLists.txt
+  >>> set(TVM_ROOT $ENV{TVM_HOME})
+      include_directories(
+      ${TVM_ROOT}/include
+      ${TVM_ROOT}/3rdparty/dlpack/include
+      ${TVM_ROOT}/3rdparty/dmlc-core/include
+      ${TVM_ROOT}/3rdparty/compiler-rt
+      )
+  
+      find_package(Eigen3 REQUIRED)
+      include_directories(${EIGEN3_INCLUDE_DIR})
+  
+      find_package(OpenCV REQUIRED)
+      include_directories(${OpenCV_INCLUDE_DIRS})
+  
+      EOS
+  ```
+
+- (14)-17 Check the CMakeLists.txt. 
+  
+  Run the following commands in docker container
+  ```
+  egrep -A 14 -B 2 TVM_HOME CMakeLists.txt
+  
+  >>> endif()
+  
+      set(TVM_ROOT $ENV{TVM_HOME})
+      include_directories(
+      ${TVM_ROOT}/include
+      ${TVM_ROOT}/3rdparty/dlpack/include
+      ${TVM_ROOT}/3rdparty/dmlc-core/include  
+      ${TVM_ROOT}/3rdparty/compiler-rt
+      )
+  
+      find_package(Eigen3 REQUIRED)
+      include_directories(${EIGEN3_INCLUDE_DIR})
+  
+      find_package(OpenCV REQUIRED)
+      include_directories(${OpenCV_INCLUDE_DIRS})
+  
+      filesystem
+  ```
+
+- (14)-18 Build stella-slam-examples. 
+  
+  Run the following commands in docker container
+  ```
+  mkdir -p build
+  cd build
+  cp ../../script/make_stella-slam-examples-tvm.sh .
+  ./make_stella-slam-examples-tvm.sh
+  ```
+
+- (14)-19 Install curl and download the orb_vocab.fbow. 
+
+  Run the following commands in docker container
+  ```
+  apt update
+  apt install curl
+  ```
+
+  ```
+  cd ${YOCTO_WORK:?}/stella_vslam_examples
+  curl -sL "https://github.com/stella-cv/FBoW_orb_vocab/raw/main/orb_vocab.fbow" -o orb_vocab.fbow
+  ```
+
+  ```
+  ls
+  >>> 3rd  CMakeLists.txt  LICENSE  README.md  build  build.sh  configuration_code  orb_vocab.fbow  scripts  src
+  ```
+  
+  ```
+  exit
+  ```
+
+## 2. Prepare microSD card to boot Linux
+
+- (15) Prepare a microSD Card 
+        
+  To boot from microSD Card, over <span style="color: red;">32GB </span >capacity of blank microSD card is needed, Please use Linux Host PC to write image data using USB card reader or other equipment.<br>
+  Please write image data to your microSD Card according to the following steps.
+
+- (16)-1 Install Necessary Software  
+  
+  Run the following commands on your Linux PC.
+  ```
+  sudo apt install bmap-tools
+  ```
+
+- (16)-2 Write image to microSD card 
+  
+  Here, we use "<span style="color: red;">/dev/sdc</span>" as microSD card device name.<br>
+  <span style="color: red;">"/dev/sdc" needs to be changed according to your environment of Ubuntu PC.</span>
+  
+- (16)-3 Write the image file to microSD 
+  
+  Run the following commands on your Linux PC.
+  ```
+  cd ${YOCTO_WORK}/build/tmp/deploy/images/rzv2h-evk-ver1/
+  sudo bmaptool copy --bmap core-image-weston-rzv2h-evk-ver1.wic.bmap core-image-weston-rzv2h-evk-ver1.wic.gz /dev/sdc
+  ```
+
+- (16)-4 Mount microSD Card. The name and the place of the mount directory can be changed as necessary. 
+  
+  Run the following commands on your Linux PC.
+  ```
+  export SD_VFAT="/media/<user-name>/3A98-31EA"
+  export SD_EXT4="/media/<user-name>/rootfs"
+  sudo mount -t vfat /dev/sdc1 $SD_VFAT
+  sudo mount -t ext4 /dev/sdc2 $SD_EXT4
+  ```
+
+- (16)-5 Write libtvm_runtime.so to microSD 
+  
+  Run the following commands on your Linux PC. 
+  ```
+  sudo cp   ${YOCTO_WORK}/libtvm_runtime.so   ${SD_EXT4}/usr/lib64
+  ```
+
+- (17)-1-0 Dataset 
+
+  The dataset can be downloaded from the following site.
+  Check the license etc.
+  The method of download shows after the next.
+  
+  [TUM Dataset](https://cvg.cit.tum.de/data/datasets/rgbd-dataset/download)<br>
+  fr3/walking_xyz<br>
+  fr3/walking_halfsphere
+
+  [EuRoC MAV Dataset](https://projects.asl.ethz.ch/datasets/doku.php?id=kmavvisualinertialdatasets)<br>
+  vicon_room1/V1_01_easy
+  
+#### This dataset used for Yolo-planar-slam, in case of using Stella-vslam skip (17)-1-1.
+  
+- (17)-1-1 downloading the dataset(TUM) and using the dataset. 
+
+- (17)-1-1a Download Dataset(rgbd_dataset_freiburg3_walking_xyz.tgz) for Yolo-planar-slam. 
+  
+  Run the following commands on your Linux PC.
+  ```
+  cd ${WORK}
+  mkdir -p dataset_yolo
+  cd ${WORK}/dataset_yolo
+  
+  wget https://vision.in.tum.de/rgbd/dataset/freiburg3/rgbd_dataset_freiburg3_walking_xyz.tgz
+  
+  wget https://svncvpr.in.tum.de/cvpr-ros-pkg/trunk/rgbd_benchmark/rgbd_benchmark_tools/src/rgbd_benchmark_tools/associate.py
+  ```
+
+- (17)-1-1b Run associate.py to make associate.txt. 
+
+  Run the following commands on your Linux PC.
+  ```
+  tar -zxvf rgbd_dataset_freiburg3_walking_xyz.tgz
+
+  sync
+
+  DATASET=rgbd_dataset_freiburg3_walking_xyz
+
+  python2 associate.py ${DATASET}/rgb.txt ${DATASET}/depth.txt > associate.txt
+  ```
+
+- (17)-1-1c Convert rgbd_dataset_freiburg3_walking_xyz to make GRAY_rgbd_dataset_freiburg3_walking_xyz. 
+  
+  Run the following commands on your Linux PC.
+  ```
+  sudo apt install imagemagick
+  cp -r rgbd_dataset_freiburg3_walking_xyz GRAY_rgbd_dataset_freiburg3_walking_xyz
+  cd GRAY_rgbd_dataset_freiburg3_walking_xyz
+  sed -i "s/rgb/gray/g" rgb.txt
+  mkdir gray
+  cd rgb
+  find *.png | xargs -I {} convert {} -colorspace Gray ../gray/{}
+  cd ../..
+  ```
+
+- (17)-1-1d Write Dataset files to the microSD 
+
+  Run the following commands on your Linux PC.
+  ```
+  sudo mkdir -p $SD_EXT4/opt/dataset/tum
+  sudo cp -r rgbd_dataset_freiburg3_walking_xyz ${SD_EXT4}/opt/dataset/tum/
+  sync
+  
+  sudo cp associate.txt ${SD_EXT4}/opt/dataset/tum/rgbd_dataset_freiburg3_walking_xyz
+  sudo cp -r GRAY_rgbd_dataset_freiburg3_walking_xyz ${SD_EXT4}/opt/dataset/tum/
+  
+  sync
+  ```
+
+#### This dataset used for Stella-vslam, in case of using Yolo-planar-slam skip (17)-1-2.
+
+- (17)-1-2 downloading dataset(TUM,EuRoC) and using the dataset.  
+
+- (17)-1-2a Download Dataset(rgbd_dataset_freiburg3_walking_xyz.tgz, V1_01_easy.zip) for Stella-vslam. 
+  
+  Run the following commands on your Linux PC.
+  ```
+  cd ${WORK}
+  mkdir -p dataset_stella
+  cd ${WORK}/dataset_stella
+  wget https://vision.in.tum.de/rgbd/dataset/freiburg3/rgbd_dataset_freiburg3_walking_halfsphere.tgz 
+  
+  wget https://svncvpr.in.tum.de/cvpr-ros-pkg/trunk/rgbd_benchmark/rgbd_benchmark_tools/src/rgbd_benchmark_tools/associate.py
+  
+  wget http://robotics.ethz.ch/~asl-datasets/ijrr_euroc_mav_dataset/vicon_room1/V1_01_easy/V1_01_easy.zip
+  ```
+
+- (17)-1-2b Run associate.py to make associate.txt. 
+  
+  Run the following commands on your Linux PC.
+  ```
+  tar xzvf rgbd_dataset_freiburg3_walking_halfsphere.tgz
+  sync
+  DATASET=rgbd_dataset_freiburg3_walking_halfsphere
+  python2 associate.py ${DATASET}/rgb.txt ${DATASET}/depth.txt > associate.txt
+  ```
+
+- (17)-1-2c Write Dataset files to the microSD 
+  
+  Run the following commands on your Linux PC.
+  ```
+  sudo cp -r rgbd_dataset_freiburg3_walking_halfsphere ${SD_EXT4}/opt/dataset/tum/
+  
+  sync
+  
+  sudo cp associate.txt ${SD_EXT4}/opt/dataset/tum/rgbd_dataset_freiburg3_walking_halfsphere
+  
+  sudo mkdir -p ${SD_EXT4}/opt/dataset/V1_01_easy
+  sudo unzip V1_01_easy.zip -d ${SD_EXT4}/opt/dataset/V1_01_easy
+  
+  sync
+  ```
+
+- (17)-2 Write files to the microSD 
+  
+  Yolo-planar-slam execution file and viewer and so on<br>
+  Run the following commands on your Linux PC.
+  ```
+  cd ${YOCTO_WORK:?}/yolo-planar-slam
+  
+  sudo mkdir -p ${SD_EXT4}/home/root/yolo-planar-slam
+  
+  tar zxvf Vocabulary/ORBvoc.txt.tar.gz -C Vocabulary
+  
+  tar zxvf ${WORK}/src_setup/yolo-planar-slam-drp/setup_files/YOLOX_S_dense_640x640_RGB_10271351.tar.gz
+  cp ${WORK}/src_setup/yolo-planar-slam-drp/setup_files/run_*planar*.sh script/
+  
+  tar zxvf ${WORK}/src_setup/yolo-planar-slam-drp/setup_files/app_yolox-S_bgr640x640_20240902.tar.gz app_yolox-S_bgr640x640/yolox_cam
+  
+  sync
+  
+  sudo cp -r YOLOX_S_dense_640x640_RGB_10271351 Vocabulary/ configuration_code/ Examples/ viewer/ script/ build/ lib/ Thirdparty/ 
+  app_yolox-S_bgr640x640/yolox_cam/ ${SD_EXT4}/home/root/yolo-planar-slam
+  
+  sync
+  ```
+
+- (17)-3 Write files to the card 
+  
+  Stella_vslam execution file and viewer and so on<br>
+  Run the following commands on your Linux PC.
+  ```
+  cd ${YOCTO_WORK:?}/stella_vslam
+  
+  sudo mkdir -p  ${SD_EXT4}/home/root/stella_vslam
+  sudo cp -r ./example  ${SD_EXT4}/home/root/stella_vslam
+  
+  cd ${YOCTO_WORK:?}/stella_vslam_examples
+  mkdir -p script
+  cp ${WORK}/src_setup/yolo-planar-slam-drp/setup_files/run_*stella*.sh script/
+  
+  tar zxvf ${WORK}/src_setup/yolo-planar-slam-drp/setup_files/app_yolox-S_bgr640x640_20240902.tar.gz app_yolox-S_bgr640x640/yolox_cam
+  
+  sudo mkdir -p ${SD_EXT4}/home/root/stella_vslam_examples/script
+  sudo cp -r orb_vocab.fbow configuration_code build script app_yolox-S_bgr640x640/yolox_cam ${SD_EXT4}/home/root/stella_vslam_examples
+  
+  sync
+  ```
+
+- (17)-4 Make eval directory 
+
+  Run the following commands on your Linux PC.
+  ```
+  sudo mkdir -p ${SD_EXT4}/home/root/stella_vslam_examples/eval
+  ```
+
+- (17)-5 Write files to the card 
+  
+  Viewer for Stella-vslam<br>
+  Run the following commands on your Linux PC.
+  ```
+  cd ${YOCTO_WORK:?}
+  
+  git clone https://github.com/stella-cv/socket_viewer
+  cd socket_viewer
+  git checkout e1e14ee
+  
+  cd ${YOCTO_WORK:?}
+  sudo mkdir -p ${SD_EXT4}/home/root/socket_viewer
+  sudo cp -r ./socket_viewer/* ${SD_EXT4}/home/root/socket_viewer
+  sudo mkdir -p                       ${SD_EXT4}/home/root/local
+  sudo cp -r ./local/lib              ${SD_EXT4}/home/root/local
+  sync
+  ```
+
+- (17)-6 Unmount microSD Card 
+  
+  Run the following commands on your Linux PC.
+  ```
+  sudo umount $SD_VFAT
+  sudo umount $SD_EXT4
   ```
 
 ## 3. Execute AI-VSLAM Sample Application
-### Start board 
+### Start board
+  ![](./img/img6.png)
 
-<img src="./img/img9.png" width="60%">
+- (18)-1 Power OFF(SW2:OFF, SW3:OFF)  
+- (18)-2 Connect equipment (see right the figure) 
+- (18)-3 Change DSw1 and DSW2 setting as shown in the figure. <br>
+         Attach microSD Card 
+- (18)-4 Turn the SW3 ON. 
+- (18)-5 Turn the SW2 ON. 
+- (18)-6 After the Boot-up, open terminal app. 
 
-- (17) - 1. Power OFF(SW2:OFF, SW3:OFF)
-- (17) - 2. Connect equipment (see right the figure)
-- (17) - 3. Change DSw1 and DSW2 setting
-              as shown in the figure.
-- (17) - 3. Attach microSD Card
-- (17) - 4. Turn the SW3 ON.
-- (17) - 5  Turn the SW2 ON.
-- (17) - 6. After the Boot-up, open terminal app.
+   Terminal app setting
+   - speed	: 115200bps
+   - data 	: 8bit
+   - Parity	: None
+   - Stop bit        	: 1bit
+   - Flow control 	: None
 
-Terminal app setting
-  - speed	: 115200bps
-  - data 	: 8bit
-  - Parity	: None
-  - Stop bit        	: 1bit
-  - Flow control 	: None
-
-<img src="./img/img10.png" width="40%">
-
-### Linux boot and Login
-
-- (17) - 7. Login as root <br>
-   ![](./img/img11.png)
-
-### Terminal with SSH
-- (17) - 8. Check the IP address of eth0(EVK) with ifconfig.
+#### Shutdown RZ/V2H EVK
+- To power-off the RZ/V2H EVK,　follow the procedures below.<br>
+  1.Run the shutdown command on board console.
   ```
-  # ifconfig
-    eth0      Link encap:Ethernet  HWaddr xx:xx:xx:xx:xx:xx
-              inet addr:192.xxx.xxx.xxx  Bcast:xxx.xxx.xxx.xxx  Mask:xxx.xxx.xxx.xxx
+  shutdown -h now
   ```
-- (17) - 9. Open two Terminals of TeraTerm with SSH. (Term1,Term2)
+  2.On board console, check that shutdown procedure runs and ends with following log.
+  ```
+  [xxxxx.xxxxxx] reboot: Power down
+  ```
+  3.Turn the SW2 OFF.<br>
+  4.Turn the SW3 OFF.
+
+#### Linux boot and Login
+- (18)-7 Login as root <br>
+  ![](./img/img7.png)
+
+#### Terminal with SSH
+- (18)-8 Check the IP address of eth0(EVK) with ifconfig. 
   
+  Run the following commands on board console.
+  ```
+  ifconfig
+  >>> eth0 Link encap:Ethernet  HWaddr xx:xx:xx:xx:xx:xx<br>
+           inet addr:192.xxx.xxx.xxx Bcast:xxx.xxx.xxx.xxx  Mask:xxx.xxx.xxx.xxx
+  ```
+
+- (18)-9 Open two Terminals of TeraTerm with SSH. (Term1,Term2) 
+
   User name: <span style="color: red;">root</span><br>
   Passphrase: <span style="color: red;">(blank)</span>
-<img src="./img/img12.png" width="80%">
-
-### Run viewer
-- (17) - 10. Run viewer server with <span style="color: red;">Term1</span>. (Run the docker container of rns/vslam-socket-server.)
-  ```
-  # cd $HOME/yolo-planar-slam/viewer
-  # node app.js
-  ```
-
-- (17) - 11. The following message is displayed. (Term1)
-  ```
-    WebSocket: listening on *:3000
-    HTTP server: listening on *:3001
-  ```
-
-- (17) - 12. Launch the browser on the PC side and input [IP address of smarc board(eth0 192.xxx.xxx.xxx)]: 3001 <br>
-![](./img/img13.png)
-
-### AI-VSLAM with using Monocular of TUM Dataset
-- (17) - 13. Initialize and modify yaml file with <span style="color: red;">Term2</span>.
-  ```
-  # cd $HOME/yolo-planar-slam
-  # source ./script/run_setenv_slam.sh
-  ```
-
-- (17) - 14. Modify yaml file. (Term2)   Refer to ./script/run_mono_tum_*.sh 
-
-  Viewer on
-  ```
-  # sed -i -e 's/Viewer.Type: None/Viewer.Type: SocketViewer/g' Examples/Monocular/TUM3.yaml
-  ```
-
-  Viewer off
-  ```
-  # sed -i -e 's/Viewer.Type: SocketViewer/Viewer.Type: None/g' Examples/Monocular/TUM3.yaml
-  ```
-
-  In case of  build option "-DENABLE_SLAMFAST=OFF" of make_yolo-planar-slam.sh (default)
-
-  w/o DRP
-  ```
-  # sed -i -e 's/UseDrp: true/UseDrp: false/g'         Examples/Monocular/TUM3.yaml
-  # sed -i -e 's/UseOpenCVA: true/UseOpenCVA: false/g' Examples/Monocular/TUM3.yaml
-  ```
+  ![](./img/img8.png)
   
-  w/ DRP
-  ```
-  # sed -i -e 's/UseDrp: false/UseDrp: true/g'         Examples/Monocular/TUM3.yaml
-  # sed -i -e 's/UseOpenCVA: false/UseOpenCVA: true/g' Examples/Monocular/TUM3.yaml
-  ```
+### Run Yolo-planar-slam
 
-  In case of  build option "-DENABLE_SLAMFAST=ON" of make_yolo-planar-slam-on.sh 
-  w/ DRP
-  ```
-  # sed -i -e 's/UseDrp: false/UseDrp: true/g'         Examples/Monocular/TUM3.yaml
-  # sed -i -e 's/UseOpenCVA: true/UseOpenCVA: false/g' Examples/Monocular/TUM3.yaml
-  ```
+#### Run viewer
 
-- (17) - 15. Run the following program. (Term2)
-  ```
-  # ./Examples/Monocular/mono_tum \
-      $HOME/yolo-planar-slam/Vocabulary/ORBvoc.txt \
-      $HOME/yolo-planar-slam/Examples/Monocular/TUM3.yaml \
-      /opt/dataset/tum/GRAY_rgbd_dataset_freiburg3_walking_xyz
-  ```
-  The SLAM result is output on the browser of the PC. (Right figure)
-
-  Parameter settings and operating modes
-  | No. | ENABLE_SLAMFAST | UseDrpAI | UseDrp | UseOpenCVA | Yolo | SLAM |
-  | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
-  | 1 | OFF | true | false | false | DRP-AI | <span style="color: red;">CPU</span> |
-  | 2 | OFF | true | true | true | DRP-AI | <span style="color: red;">DRP lib : OpenCVA</span> |
-  | 3 | ON | true | true | false | DRP-AI | <span style="color: red;">DRP lib : Custom</span> |
-
-### AI-VSLAM with using RGB-D of TUM Dataset
-- (17) - 16. Initialize and modify yaml file with <span style="color: red;">Term2</span>.
-  ```
-  # cd $HOME/yolo-planar-slam
-  # source ./script/run_setenv_slam.sh
-  ```
-
-- (17) - 17. Modify yaml file. (Term2)   Refer to ./script/run_rgbd_tum_*.sh 
-
-  Viewer on
-  ```
-  # sed -i -e 's/Viewer.Type: None/Viewer.Type: SocketViewer/g' Examples/RGB-D/TUM3.yaml
-  ```
-
-  Viewer off
-  ```
-  # sed -i -e 's/Viewer.Type: SocketViewer/Viewer.Type: None/g' Examples/RGB-D/TUM3.yaml
-  ```
-
-  In case of  build option "-DENABLE_SLAMFAST=OFF" of make_yolo-planar-slam.sh (default)
-
-  w/o DRP
-  ```
-  # sed -i -e 's/UseDrp: true/UseDrp: false/g'         Examples/RGB-D/TUM3.yaml
-  # sed -i -e 's/UseOpenCVA: true/UseOpenCVA: false/g' Examples/RGB-D/TUM3.yaml
-  ```
+- (19) - 1. Run viewer server with <span style="color: red;">Term1. </span>
   
-  w/ DRP
   ```
-  # sed -i -e 's/UseDrp: false/UseDrp: true/g'         Examples/RGB-D/TUM3.yaml
-  # sed -i -e 's/UseOpenCVA: false/UseOpenCVA: true/g' Examples/RGB-D/TUM3.yaml
-  ```
-
-  In case of  build option "-DENABLE_SLAMFAST=ON" of make_yolo-planar-slam-on.sh 
-  w/ DRP
-  ```
-  # sed -i -e 's/UseDrp: false/UseDrp: true/g'         Examples/RGB-D/TUM3.yaml
-  # sed -i -e 's/UseOpenCVA: true/UseOpenCVA: false/g' Examples/RGB-D/TUM3.yaml
+  cd $HOME/yolo-planar-slam/viewer
+  node app.js
   ```
 
-- (17) - 18. Run the following program. (Term2)
+- (19)-2 The following message is displayed. (Term1) 
+
   ```
-  # ./Examples/RGB-D/rgbd_tum \
-      $HOME/yolo-planar-slam/Vocabulary/ORBvoc.txt \
-      $HOME/yolo-planar-slam/Examples/RGB-D/TUM3.yaml \
-      /opt/dataset/tum/rgbd_dataset_freiburg3_walking_xyz \
-      /opt/dataset/tum/rgbd_dataset_freiburg3_walking_xyz/associate.txt
-  ```
-  The SLAM result is output on the browser of the PC. (Right figure)
-
-  Parameter settings and operating modes
-  | No. | ENABLE_SLAMFAST | UseDrpAI | UseDrp | UseOpenCVA | Yolo | SLAM |
-  | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
-  | 1 | OFF | true | false | false | DRP-AI | <span style="color: red;">CPU</span> |
-  | 2 | OFF | true | true | true | DRP-AI | <span style="color: red;">DRP lib : OpenCVA</span> |
-  | 3 | ON | true | true | false | DRP-AI | <span style="color: red;">DRP lib : Custom</span> |
-
-### AI-VSLAM with using USB camera
-
-It is necessary to use parameters that have been calibrated for the camera.<br>
-Change "ELP_rns-2022-0901.yaml" to the calibrated parameters. 
-
-- (17) - 19. Initialize and modify yaml file with  <span style="color: red;">Term2</span>.
-  ```
-  # cd $HOME/yolo-planar-slam
-  # source ./script/run_setenv_slam.sh
+  WebSocket: listening on *:3000
+  HTTP server: listening on *:3001
   ```
 
-- (17) - 20. Modify yaml file. (Term2) Refer to ./script/run_mono_usbcam_*.sh 
+- Launch <span style="color: red;"> the browser on the PC side</span> and input [IP address of smarc board(eth0 192.xxx.xxx.xxx)]: 3001 (19)-3<br>
+  ![](./img/img9.png)
 
-  Viewer on
+#### Execute AI-VSLAM
+- (19)-4 Initialize and modify yaml file with <span style="color: red;"> Term2</span>. 
   ```
-  # sed -i -e 's/Viewer.Type: None/Viewer.Type: SocketViewer/g' Examples/Monocular/ELP_rns-2022-0901.yaml
-  ```
-
-  Viewer off
-  ```
-  # sed -i -e 's/Viewer.Type: SocketViewer/Viewer.Type: None/g' Examples/Monocular/ELP_rns-2022-0901.yaml
+  cd $HOME/yolo-planar-slam
+  source ./script/run_setenv_planar_slam.sh
   ```
 
-  In case of  build option "-DENABLE_SLAMFAST=OFF" of make_yolo-planar-slam.sh (default)
-
-  w/o DRP
+- (19)-5 Run the following program. (Term2) 
   ```
-  # sed -i -e 's/UseDrp: true/UseDrp: false/g'         Examples/Monocular/ELP_rns-2022-0901.yaml
-  # sed -i -e 's/UseOpenCVA: true/UseOpenCVA: false/g' Examples/Monocular/ELP_rns-2022-0901.yaml
+  ./script/run_planar_vslam.sh [1] [2] [3]
   ```
+  <span style="color: red;"> For example,  MODE:Monocular/GRAY, SLAM:OpenCVA(DRP), Viewer:off</span>
+  ```
+  ./script/run_planar_vslam.sh 1 1 0
+  ```
+  Select arguments [1] to [3] of the script from the following table.
   
-  w/ DRP
-  ```
-  # sed -i -e 's/UseDrp: false/UseDrp: true/g'         Examples/Monocular/ELP_rns-2022-0901.yaml
-  # sed -i -e 's/UseOpenCVA: false/UseOpenCVA: true/g' Examples/Monocular/ELP_rns-2022-0901.yaml
+  |[1]|[2]|[3]| --- |
+  | ---- | ---- |---- | ---- |
+  | MODE | SLAM | Viewer | Yolox-S|
+  |0: Monocular : rgbd_dataset_freiburg3_walking_xyz<br>1: Monocular : GRAY_rgbd_dataset_freiburg3_walking_xyz<br>2: Monocular : ELP USB Camera <span style="color: red;">*1</span><br>3: RGB-D      : rgbd_dataset_freiburg3_walking_xyz| 0: CPU<span style="color: red;">*2</span><br>1: OpenCVA(DRP) <span style="color: red;">*2</span><br>2: Custom(DRP) <span style="color: red;">*3</span>| 0: OFF<br>1: ON | DRPAI fixed |
 
-  ```
+  *1. It is necessary to use parameters that have been calibrated for the camera.<br>Change "ELP_rns-2022-0901.yaml" to the calibrated parameters.  (Refer to SoCDD-08466-02_RZV2H_AI_VSLAM_InstallGuid.)<br>
+  *2. It is necessary to build yolo-planar-slam with option "-DENABLE_SLAMFAST=OFF" of make_yolo-planar-slam-oca-xxx.sh.<br>
+  *3. It is necessary to build yolo-planar-slam with option "-DENABLE_SLAMFAST=ON" of make_yolo-planar-slam-cus-xxx.sh.
 
-  In case of  build option "-DENABLE_SLAMFAST=ON" of make_yolo-planar-slam-on.sh 
-  w/ DRP
-  ```
-  # sed -i -e 's/UseDrp: false/UseDrp: true/g'         Examples/Monocular/ELP_rns-2022-0901.yaml
-  # sed -i -e 's/UseOpenCVA: true/UseOpenCVA: false/g' Examples/Monocular/ELP_rns-2022-0901.yaml
-  ```
+#### Browser
+- (19)-6 Browser 
+   ![](./img/img10.png)
+   ![](./img/img11.png)
 
-- (17) - 21. Run the following program. (Term2)
-  ```
-  # ./Examples/Monocular/mono_usbcam \
-      $HOME/yolo-planar-slam/Vocabulary/ORBvoc.txt \
-      $HOME/yolo-planar-slam/Examples/Monocular/ELP_rns-2022-0901.yaml
-  ```
+#### Re-build and Transfer the application
+**<span style="color: red;">Open new terminal.</span>**<br>
+After editing software and build option, execute following command.
 
-  Parameter settings and operating modes
-  | No. | ENABLE_SLAMFAST | UseDrpAI | UseDrp | UseOpenCVA | Yolo | SLAM |
-  | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
-  | 1 | OFF | true | false | false | DRP-AI | <span style="color: red;">CPU</span> |
-  | 2 | OFF | true | true | true | DRP-AI | <span style="color: red;">DRP lib : OpenCVA</span> |
-  | 3 | ON | true | true | false | DRP-AI | <span style="color: red;">DRP lib : Custom</span> |
-
-### Browser
-- (17) - 22. Browser 
-<img src="./img/img14.png" width="80%">
-
-### Re-build and Transfer the application
-- (18) Re-build AI-VSLAM application
+- (20) Re-build AI-VSLAM application 
   
-  <span style="color: red;">Open new terminal.</span><br>
-  After editing software and build option, execute following command.<br>
-  *Example for Modify  "-DENABLE_SLAMFAST=OFF → ON" in make_yolo-planar-slam-on.sh*
+  Run the following commands on your Linux PC.
   ```
-  $ export WORK="<working directory>"
-  $ export YOCTO_WORK=${WORK}/src_setup/yocto
-  $ cd ${YOCTO_WORK}/yolo-planar-slam
-
-  $ source /opt/poky/3.1.26/environment-setup-aarch64-poky-linux
-  $ source ./script/setup.sh
-
-  $ rm -r build
-  $ mkdir -p build
-  $ cd ./build
-  $ cp ${WORK}/src_setup/yolo-planar-slam-drp/setup_files/make_yolo-planar-slam-on.sh .
+  export WORK="<working directory>"
+  export YOCTO_WORK="${WORK}/src_setup/yocto"
+  export AI_SDK_WORK="${WORK}/ai_sdk_work"
+  cd ${AI_SDK_WORK}/ai_sdk_setup
   
-  $ ./make_yolo-planar-slam-on.sh
+  docker start -i rzv2h_ai_sdk_container_slam_2.12.3
+  ```
+
+  Run the following commands in docker container
+  ```
+  export YOCTO_WORK="/drp-ai_tvm/yocto"
+  cd ${YOCTO_WORK}/yolo-planar-slam
+  source /opt/poky/3.1.31/environment-setup-aarch64-poky-linux
+  source script/setup.sh
+  
+  mkdir -p build
+  cd build
+  ```
+
+  Change the make script depending on the DRP library.
+  OpenCVA or CPU (using AI-Translator) :
+
+  ```
+  cp ../../script/make_yolo-planar-slam-oca-trn.sh .
+  ./make_yolo-planar-slam-oca-trn.sh
+  ```
+
+  OpenCVA or CPU (using Translator) :
+  ```
+  cp ../../script/make_yolo-planar-slam-oca-tvm.sh .
+  ./make_yolo-planar-slam-oca-tvm.sh
+  ```
+
+  Custom(using TVM):  
+  ```
+  cp ../../script/make_yolo-planar-slam-cus-trn.sh .
+  ./make_yolo-planar-slam-cus-trn.sh
+  ```
+
+  Custom(using TVM):
+  ```
+  cp ../../script/make_yolo-planar-slam-cus-tvm.sh .
+  ./make_yolo-planar-slam-cus-tvm.sh
+  ```
+
+  ```
+  exit
   ```
 
   Check the IP address of eth0 (EVK)  and remove the old data (EVK).
-
+  
+  Run the following commands on board console.
   ```
-  # ifconfig
-    eth0Link encap:Ethernet  HWaddr xx:xx:xx:xx:xx:xx
-                   inet addr:192.xxx.xxx.xxx  Bcast:xxx.xxx.xxx.xxx  Mask:xxx.xxx.xxx.xxx
-
-  # cd ${YOCTO_WORK}/yolo-planar-slam
-  # rm -r Examples build lib Thirdparty
+  ifconfig
+  >>> eth0 Link encap:Ethernet  HWaddr xx:xx:xx:xx:xx:xx<br>
+           inet addr:192.xxx.xxx.xxx  Bcast:xxx.xxx.xxx.xxx  Mask:xxx.xxx.xxx.xxx
   ```
-
-  Copy the following directory to EVK.
+  
   ```
-  # cd $WORK/yolo-planar-slam
-  # scp -r Examples build lib Thirdparty root@192.xxx.xxx.xxx:/home/root/yolo-planar-slam
+  cd ${HOME}/yolo-planar-slam
+  rm -r Examples build lib Thirdparty
   ```
 
-  Sync on EVK.
+  Copy the following directory to EVK.<br>
+  Run the following commands on your Linux PC.
+
   ```
-  # sync
+  cd ${YOCTO_WORK}/yolo-planar-slam
+
+  scp -r Examples build lib Thirdparty root@192.xxx.xxx.xxx:/home/root/yolo-planar-slam
+  ```
+
+  Sync on EVK.<br>
+  Run the following commands on board console.
+  ```
+  sync
+  ```
+
+### Run Stella-vslam
+- (21)-1 Run viewer server with <span style="color: red;">Term1</span>. 
+  ```
+  cd $HOME/socket_viewer
+  node app.js
+  ```
+
+- (21)-2 The following message is displayed. (Term1) 
+  ```
+  WebSocket: listening on *:3000
+  HTTP server: listening on *:3001
+  ```
+
+- (21)-3 Launch <span style="color: red;">the browser on the PC side</span> and input [IP address of smarc board(eth0 192.xxx.xxx.xxx)]: 3001 <br>
+  ![](./img/img12.png)
+
+### Execute AI-VSLAM
+- (21)-4 Initialize and modify yaml file with <span style="color: red;">Term2</span>. 
+
+- (21)-5 Run the following program. (Term2) 
+  ```
+  ./script/run_stella_vslam_examples.sh [1] [2] [3] [4]
+  ```
+
+  Select arguments [1] to [4] of the script from the following table.
+  
+  |[1]|[2]|[3]| [4] |
+  | ---- | ---- |---- | ---- |
+  | MODE | SLAM | Yolox-S | Viewer|
+  |0: Monocular : rgbd_dataset_freiburg3_walking_halfsphere<br>1: Monocular : ELP USB Camera <span style="color: red;">*1</span><br>2: RGB-D      : rgbd_dataset_freiburg3_walking_halfsphere<br>
+  3: Stereo       : V1_01_easy| 0: CPU<br>1: OpenCVA(DRP)<br>2: Custom(DRP)|0: ------ <span style="color: red;">*2</span><br>1: DRPAI| : OFF<br>1: ON|
+
+  *1. It is necessary to use parameters that have been calibrated for the camera.<br>Change "ELP_rns-2022-0901.yaml" to the calibrated parameters.  (Refer to SoCDD-08466-02_RZV2H_AI_VSLAM_InstallGuid.)<br>
+  *2. Yolox-s does not run on either the CPU or the DRPAI.
+
+### Browser
+- (21)-6 Browser 
+   ![](./img/img13.png)
+   ![](./img/img14.png)
+
+### Re-build and Transfer the application
+**<span style="color: red;">Open new terminal.</span>**<br>
+After editing software and build option, execute following command.
+
+- (22) Re-build AI-VSLAM application
+  
+  Run the following commands on your Linux PC.
+  ```
+  export WORK="<working directory>"
+  export YOCTO_WORK="${WORK}/src_setup/yocto"
+  export AI_SDK_WORK="${WORK}/ai_sdk_work"
+  cd ${AI_SDK_WORK}/ai_sdk_setup
+  
+  docker start -i rzv2h_ai_sdk_container_slam_2.12.3
+  ```
+  
+  Run the following commands in docker container
+  ```
+  export YOCTO_WORK="/drp-ai_tvm/yocto"
+  cd ${YOCTO_WORK}/stella_vslam
+  source /opt/poky/3.1.31/environment-setup-aarch64-poky-linux
+  source scripts/setup.sh
+  export CMAKE_INSTALL_PREFIX=${YOCTO_WORK:?}/local
+  
+  cd ${YOCTO_WORK}/stella_vslam
+  mkdir -p build
+  cd ./build
+  cp ../../script/make_stella-slam-tvm.sh .
+  ./make_stella-slam-tvm.sh
+  make install
+  
+  cd ${YOCTO_WORK}/socket_publisher
+  mkdir -p build
+  cd build
+  cp ../../script/make_socket_publisher.sh .
+  ./make_socket_publisher.sh
+  make install
+  
+  cd ${YOCTO_WORK}/stella_vslam_examples
+  mkdir -p build
+  cd build
+  cp ../../script/make_stella-slam-examples-tvm.sh .
+  ./make_stella-slam-examples-tvm.sh
+  
+  exit
+  ```
+  
+  Check the IP address of eth0 (EVK)  and remove the old data (EVK).
+
+  Run the following commands on board console.
+  ```
+  ifconfig
+  >>> eth0 Link encap:Ethernet  HWaddr xx:xx:xx:xx:xx:xx<br>
+           inet addr:192.xxx.xxx.xxx  Bcast:xxx.xxx.xxx.xxx  Mask:xxx.xxx.xxx.xxx
+  ```
+  
+  ```
+  cd ${HOME}/stella_vslam
+  rm -r example
+  
+  cd ${HOME}/stella_vslam_examples
+  rm -r build
+  
+  cd ${HOME}/local
+  rm -r lib
+  ```
+
+  Copy the following directory to EVK.<br>
+  Run the following commands on your Linux PC.
+  ```
+  cd ${YOCTO_WORK}/stella_vslam
+  scp -r example root@192.xxx.xxx.xxx:/home/root/stella_vslam
+  sync
+  ```
+
+  Sync on EVK.<br>
+  Run the following commands on board console.
+  ```
+  sync
+  ```
+
+  Run the following commands on your Linux PC.
+  ```
+  cd ${YOCTO_WORK}/stella_vslam_examples
+  scp -r build root@192.xxx.xxx.xxx:/home/root/stella_vslam_examples
+  sync
+  ```
+
+  Run the following commands on board console.
+  ```
+  sync
+  ```
+
+  Run the following commands on your Linux PC.
+  ```
+  cd ${YOCTO_WORK}/local
+  scp -r lib root@192.xxx.xxx.xxx:/home/root/local
+  sync
+  ```
+
+  Run the following commands on board console.
+  ```
+  sync
   ```
