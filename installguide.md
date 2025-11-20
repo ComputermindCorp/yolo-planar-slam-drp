@@ -225,7 +225,15 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   egrep 8388608 conf/local.conf
   >>> IMAGE_ROOTFS_EXTRA_SPACE = "8388608"
   ```
-  
+- (8) Run the following commands to extract the OSS package to the ${YOCTO_WORK}/build directory.
+
+  ```
+  cp ${WORK}/src_setup/oss_pkg_rzv_*.7z ${YOCTO_WORK}
+  7z x ${YOCTO_WORK}/oss_pkg_rzv_*.7z -o${YOCTO_WORK}/build
+  ls -1 ${YOCTO_WORK}/build
+  >>> conf
+      downloads
+  ```
 - (8) Build the target file system image using bitbake.
   
   Run the commands on your Linux PC below to start a build. Building an image can take up to a few hours depending on the user’s host system performance.
