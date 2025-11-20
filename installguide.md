@@ -32,7 +32,7 @@ Equipment and Software Necessary for Developing Environments as follows.
 | Equipment | Description |
 | ---- | ---- |
 | Target Board | RZ/V2H EVK |
-| Linux host PC | Build embedded Linux, Create microSD Card.<br><span style="color: red;">Ubuntu version 20.04 LTS (64 bit OS must be used.)</span><br>&emsp; - 100GB free space on HDD is necessary.<br>Recommended memory size<br>&emsp; - DDR memory 16GB and SWAP 32GB<br>&emsp; - DDR memory 32GB and SWAP 16GB<br>&emsp; - DDR memory 48GB and SWAP 2GB<br> |
+| Linux host PC | Build embedded Linux__,__ Create microSD Card.<br><span style="color: red;">Ubuntu version 20.04 LTS (64 bit OS must be used.)</span><br>&emsp; - 100GB free space on HDD is necessary.<br>Recommended memory size<br>&emsp; - DDR memory 16GB and SWAP 32GB<br>&emsp; - DDR memory 32GB and SWAP 16GB<br>&emsp; - DDR memory 48GB and SWAP 2GB<br> |
 | Windows host PC | Communicate Target Board with terminal software.<br>Windows 10 is recommended. |
 | Terminal software | Used for controlling serial console of the target board<br>Tera Term (latest version) is recommended<br>Available at https://ttssh2.osdn.jp/index.html.en |
 | VCP Driver | Virtual COM Port driver which enables to communicate<br>Windows Host PC and the target board via USB<br>which is virtually used as serial port. <br>Available at: http://www.ftdichip.com/Drivers/VCP.htm<br>Please install VCP Driver corresponding to the target board. |
@@ -373,8 +373,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   
   In docker container, run the following command to copy libtvm_runtime.so, which is the necessary file for the board and Cross Compiler environment. 
   
--  (12)-7 Run the following commands 
-  <span style="color: red;">in  docker container</span>
+-  (12)-7 Run the following commands __in  docker container__
     ```
     export YOCTO_WORK="/drp-ai_tvm/yocto"
     cp /drp-ai_tvm/obj/build_runtime/V2H/libtvm_runtime.so ${YOCTO_WORK:?}
@@ -398,7 +397,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   
 - (13-a)-2 Setup the environment for building application. 
 
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   export YOCTO_WORK="/drp-ai_tvm/yocto"
   cd ${YOCTO_WORK:?}/yolo-planar-slam
@@ -409,7 +408,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   
 - (13-a)-3Make yolo-planar-slam using AI translator. 
 
-  Run the following commands <span style="color: red;">in docker container</span>  
+  Run the following commands __in docker container__  
   ```
   mkdir build
   cd build
@@ -437,29 +436,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   Options of make_yolo-planar-slam-oca-trn.sh
   
   ```
-  cmake -DCMAKE_BUILD_TYPE=Release \
-    -DENABLE_MEASURE_TIME=ON \
-    -DENABLE_DUMP=OFF \
-    -DENABLE_DRP=ON \
-    -DENABLE_DRP_AI=ON \
-    -DENABLE_REALSENSE2=OFF \
-    -DENABLE_GOOGLE_PERF=OFF \
-    -DENABLE_YOCTO=ON \
-    -DENABLE_SLAMFAST=<span style="color: red;"> OFF</span> \
-    -DENABLE_DRPAI_EXPAND_MEMORY_SPACE=OFF \
-    -DENABLE_CALL_OPENCVA_DIRECTLY=ON \
-    -DOpenMP_C_FLAGS='-fopenmp' \
-    -DOpenMP_CXX_FLAGS='-fopenmp' \
-    -DOpenMP_C_LIB_NAMES='gomp;pthread' \
-    -DOpenMP_CXX_LIB_NAMES='gomp;pthread' \
-    
-    -DOpenMP_gomp_LIBRARY=${SDKTARGETSYSROOT}/usr/lib64/libgomp.so \
-
-    -DOpenMP_pthread_LIBRARY=${SDKTARGETSYSROOT}/usr/lib64/libpthread.so \
-    
-    -DYOLO_PLANAR_SLAM_VERSION=${YOLO_PLANAR_SLAM_VERSION} \
-    ..
-  make -j 
+  -DENABLE_SLAMFAST=OFF \
   ```
 
   ***In case of Cudtom***
@@ -467,28 +444,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   Options of make_yolo-planar-slam-cus-trn.sh
 
   ```
-  cmake -DCMAKE_BUILD_TYPE=Release \
-    -DENABLE_MEASURE_TIME=ON \
-    -DENABLE_DUMP=OFF \
-    -DENABLE_DRP=ON \
-    -DENABLE_DRP_AI=ON \
-    -DENABLE_REALSENSE2=OFF \
-    -DENABLE_GOOGLE_PERF=OFF \
-    -DENABLE_YOCTO=ON \
-    -DENABLE_SLAMFAST=<span style="color: red;">ON</span> \
-    -DENABLE_DRPAI_EXPAND_MEMORY_SPACE=OFF \
-    -DENABLE_CALL_OPENCVA_DIRECTLY=ON \
-    -DOpenMP_C_FLAGS='-fopenmp' \
-    -DOpenMP_CXX_FLAGS='-fopenmp' \
-    -DOpenMP_C_LIB_NAMES='gomp;pthread' \
-    -DOpenMP_CXX_LIB_NAMES='gomp;pthread' \
-    -DOpenMP_gomp_LIBRARY=${SDKTARGETSYSROOT}/usr/lib64/libgomp.so \
-    
-    -DOpenMP_pthread_LIBRARY=${SDKTARGETSYSROOT}/usr/lib64/libpthread.so \
-    
-    -DYOLO_PLANAR_SLAM_VERSION=${YOLO_PLANAR_SLAM_VERSION} \
-    ..
-  make -j
+  -DENABLE_SLAMFAST=ON \
   ```
 
 >__In case of using AI translator version skip (13-b).__
@@ -504,7 +460,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (13-b)-2 Setup the environment for building application. 
 
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   export YOCTO_WORK="/drp-ai_tvm/yocto"
   cd ${YOCTO_WORK:?}/yolo-planar-slam
@@ -515,7 +471,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (13-b)-3 Add the include directories of TVM to the CMakeLists.txt. 
 
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   cat << 'EOS' | sed -i '121r /dev/stdin' ./CMakeLists.txt
   >>> set(TVM_ROOT $ENV{TVM_HOME})
@@ -531,7 +487,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (13-b)-4 Check the CMakeLists.txt. 
   
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   egrep -A 8 -B 3 TVM_HOME CMakeLists.txt
 
@@ -551,7 +507,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (13-b)-5 Make yolo-planar-slam using TVM.  
   
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   mkdir build
   cd build
@@ -589,7 +545,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (14)-2 Setup the environment for building application. 
 
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   export YOCTO_WORK="/drp-ai_tvm/yocto"
   cd ${YOCTO_WORK:?}/stella_vslam
@@ -600,7 +556,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (14)-3 Make a local directory. 
 
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   export CMAKE_INSTALL_PREFIX=${YOCTO_WORK:?}/local
   mkdir -p ${CMAKE_INSTALL_PREFIX:?}
@@ -608,7 +564,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (14)-4 Clone the repository of g2o. 
 
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   cd ${YOCTO_WORK:?}
   
@@ -620,7 +576,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (14)-5 Build g2o and independent of OpenGL and then install. 
 
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   mkdir -p build
   cd ./build
@@ -635,7 +591,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (14)-6 Register as safe directories. 
 
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   cd ${YOCTO_WORK:?}/stella_vslam  
   git config --global --add safe.directory /drp-ai_tvm/yocto/stella_vslam
@@ -647,7 +603,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (14)-7 Add the include directories of TVM to the CMakeLists.txt. 
 
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   cat << 'EOS' | sed -i '160r /dev/stdin' ./CMakeLists.txt
   >>> set(TVM_ROOT $ENV{TVM_HOME})
@@ -663,7 +619,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (14)-8 Check the CMakeLists.txt. 
 
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   egrep -A 8 -B 3 TVM_HOME CMakeLists.txt
 
@@ -683,7 +639,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (14)-9 Build stella_vslam and install. 
   
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   mkdir -p build
   cd ./build
@@ -695,7 +651,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (14)-10 Clone the repository of socket_publisher. 
   
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   cd ${YOCTO_WORK:?}
   
@@ -706,14 +662,14 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (14)-11 Add "SIOCLIENT_LIBRARY" to CMakeLists.txt. 
   
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   sed -i 's/find_package(sioclient REQUIRED)/find_package(sioclient REQUIRED)\n# Change SIOCLIENT_LIBRARY for BitBake\nset(SIOCLIENT_LIBRARY "sioclient")\n/g' CMakeLists.txt
   ```
   
 - (14)-12 Add the include directories of EIGEN3 and OpenCV to the CMakeLists.txt. 
 
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   cat << 'EOS' | sed -i '61r /dev/stdin' ./CMakeLists.txt
   >>> find_package(Eigen3 REQUIRED)
@@ -727,7 +683,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (14)-13 Check the CMakeLists.txt. 
   
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   egrep -A 8 -B 3 "Eigen3" CMakeLists.txt
 
@@ -747,7 +703,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (14)-14 Build socket_publisher and install. 
   
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   mkdir -p build
   cd build
@@ -759,7 +715,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (14)-15 Register as safe directories. 
 
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   cd ${YOCTO_WORK:?}/stella_vslam_examples
   
@@ -772,7 +728,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (14)-16 Add the include directories of TVM and EIGEN3 and OpenCV to the CMakeLists.txt. 
 
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   cat << 'EOS' | sed -i '17r /dev/stdin' ./CMakeLists.txt
   >>> set(TVM_ROOT $ENV{TVM_HOME})
@@ -794,7 +750,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (14)-17 Check the CMakeLists.txt. 
   
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   egrep -A 14 -B 2 TVM_HOME CMakeLists.txt
   
@@ -819,7 +775,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (14)-18 Build stella-slam-examples. 
 
-   Run the following commands <span style="color: red;">in docker container</span>
+   Run the following commands __in docker container__
     ```
     mkdir -p build
     cd build
@@ -829,7 +785,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (14)-19 Install curl and download the orb_vocab.fbow. 
 
-  Run the following commands <span style="color: red;">in docker container</span>
+  Run the following commands __in docker container__
   ```
   apt update
   apt install curl
