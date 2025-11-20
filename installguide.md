@@ -19,7 +19,8 @@ Provided items from Renesas are listed below
 | ---- | ---- | ---- |
 | RZ/V2H AI SDK Source Code | RTK0EF0180F05200SJ_linux-src.zip | https://www.renesas.com/en/document/sws/rzv2h-ai-sdk-v520-source-code|
 |   |  - README.txt | README file. | 
-|   |  - rzv2h_ai-sdk_yocto_recipe_v3.00.tar.gz | Yocto recipe.<br> Yocto recipes are text files that contains necessary information to build Yocto Linux.|
+|   |  - rzv2h_ai-sdk_yocto_recipe_v5.20.tar.gz | Yocto recipe.<br> Yocto recipes are text files that contains necessary information to build Yocto Linux.|
+|   |  - oss_pkg_rzv_v5.20.7z | OSS package.<br> OSS package is a set of open-source software source code used when building Yocto Linux. |
 | RZ/V2H AI SDK | RTK0EF0180F05200SJ.zip | https://www.renesas.com/en/document/sws/rzv2h-ai-sdk-v520 |
 |   |  - Dockerfile | Dockerfile for cross compile envirement | 
 |   |  - DRP-AI_Translator_i8-v1.00-Linux-x86_64-Install | AI Translator installer|
@@ -113,6 +114,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   ls -1 ${WORK}/src_setup
   >>> README.txt
       rzv2h_ai-sdk_yocto_recipe_v5.20.tar.gz
+      oss_pkg_rzv_v5.20.7z
   ```
   
   ```
