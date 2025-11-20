@@ -17,10 +17,10 @@ Provided items from Renesas are listed below
 #### RZ/V2H AI SDK
 | Category | File name | Download site / Description |
 | ---- | ---- | ---- |
-| RZ/V2H AI SDK Source Code | RTK0EF0180F05000SJ_linux-src.zip | https://www.renesas.com/us/en/document/sws/rzv2h-ai-sdk-v500-source-code |
+| RZ/V2H AI SDK Source Code | RTK0EF0180F05200SJ_linux-src.zip | https://www.renesas.com/en/document/sws/rzv2h-ai-sdk-v520-source-code|
 |   |  - README.txt | README file. | 
 |   |  - rzv2h_ai-sdk_yocto_recipe_v3.00.tar.gz | Yocto recipe.<br> Yocto recipes are text files that contains necessary information to build Yocto Linux.|
-| RZ/V2H AI SDK | RTK0EF0180F05000SJ.zip | https://www.renesas.com/us/en/document/sws/rzv2h-ai-sdk-v500 |
+| RZ/V2H AI SDK | RTK0EF0180F05200SJ.zip | https://www.renesas.com/en/document/sws/rzv2h-ai-sdk-v520 |
 |   |  - Dockerfile | Dockerfile for cross compile envirement | 
 |   |  - DRP-AI_Translator_i8-v1.00-Linux-x86_64-Install | AI Translator installer|
 
@@ -92,15 +92,14 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 ### Build Instructions
 
-- (1) Download RZ/V2H AI SDK Source Code.
+- (1) Download [RZ/V2H AI SDK Source Code](https://www.renesas.com/en/document/sws/rzv2h-ai-sdk-v520-source-code).
 
-  https://www.renesas.com/us/en/document/sws/rzv2h-ai-sdk-v500-source-code
-  <span style="color: black;">RTK0EF0180F05000SJ_linux-src.zip</span>
+  - Source Code：<span style="color: black;">RTK0EF0180F05200SJ_linux-src.zip</span>
 
 - (2) Deploy the files of RZ/V2H AI SDK and vslam.
 
   Create a working directory(${WORK}/src_setup) at Linux Host PC and deploy these files in your work directory.
-  - Linux BSP			: <span style="color: black;"> RTK0EF0180F05000SJ_linux-src.zip </span>
+  - Linux BSP   : <span style="color: black;"> RTK0EF0180F05200SJ_linux-src.zip </span>
   - AI SLAM application and recipe		: <span style="color: black;"> yolo-planar-slam-drp </span>  
   
   Please deploy these file as follows. The name and the place of the working directory can be changed as necessary.
@@ -110,10 +109,10 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   export WORK="<working directory>"
   mkdir -p ${WORK}/src_setup
   cd ${WORK}/src_setup
-  unzip RTK0EF0180F05000SJ_linux-src.zip -d ${WORK}/src_setup
+  unzip RTK0EF0180F05200SJ_linux-src.zip -d ${WORK}/src_setup
   ls -1 ${WORK}/src_setup
   >>> README.txt
-      rzv2h_ai-sdk_yocto_recipe_v5.00.tar.gz
+      rzv2h_ai-sdk_yocto_recipe_v5.20.tar.gz
   ```
   
   ```
@@ -147,7 +146,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   export YOCTO_WORK=${WORK}/src_setup/yocto
   mkdir -p ${YOCTO_WORK}
   cd ${YOCTO_WORK}
-  tar zxvf ${WORK}/src_setup/rzv2h_ai-sdk_yocto_recipe_v5.00.tar.gz
+  tar zxvf ${WORK}/src_setup/rzv2h_ai-sdk_yocto_recipe_v5.20.tar.gz
   ls -1 ${YOCTO_WORK}
   >>> 0001-tesseract.patch
       meta-gplv2
@@ -211,14 +210,14 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
   Run the following commands on your Linux PC.
 
-  The case of using 32GB microSD
+  The case of using <span style="color: red;">32GB</span> microSD
   ```
   sed -i 's/1048576/16777216/g' conf/local.conf
   egrep 16777216 conf/local.conf
   >>> IMAGE_ROOTFS_EXTRA_SPACE = "16777216"
   ```
 
-  The case of using 16GB microSD
+  The case of using <span style="color: red;">16GB</span> microSD
   ```
   sed -i 's/1048576/8388608/g' conf/local.conf
   egrep 8388608 conf/local.conf
@@ -313,23 +312,24 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   ```
 
 - (12)-3 Download RZ/V2H AI SDK and extract AI SDK.
-  
-  https://www.renesas.com/us/en/document/sws/rzv2h-ai-sdk-v500
 
-  RTK0EF0180F05000SJ.zip
+  Refer the link below
+  [Download Link](https://www.renesas.com/en/document/sws/rzv2h-ai-sdk-v520)
+  
+  - RTK0EF0180F05200SJ.zip
   
   Run the following commands on your Linux PC.
   ```
   cd $WORK
   mkdir -p ai_sdk_work
   cd ${AI_SDK_WORK}
-  unzip RTK0EF0180F05000SJ.zip
+  unzip RTK0EF0180F05200SJ.zip
   ```
 
   ```
   cd ${AI_SDK_WORK}
   ls
-  >>> ai_sdk_setup  board_setup  documents  r11an0840ej0500-rzv2h-ai-sdk.pdf  references
+  >>> ai_sdk_setup  board_setup  documents  r11an0840ej0520-rzv2h-ai-sdk.pdf  references
   ```
   
 #### Make sure that you have installed Docker  on your Linux PC.
@@ -361,20 +361,21 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   docker run -it --name rzv2h_ai_sdk_container_slam_2.12.3 -v ${YOCTO_WORK}:/drp-ai_tvm/yocto rzv2h_ai_sdk_image:slam_2.12.3
   ```  
   
-  In docker container, run the following command to copy libtvm_runtime.so, which is the necessary file for the board and Cross Compiler environment. (12)-7
+  In docker container, run the following command to copy libtvm_runtime.so, which is the necessary file for the board and Cross Compiler environment. 
   
-  Run the following commands in docker container
-  ```
-  export YOCTO_WORK="/drp-ai_tvm/yocto"
-  cp /drp-ai_tvm/obj/build_runtime/V2H/libtvm_runtime.so ${YOCTO_WORK:?}
-  cp /drp-ai_tvm/obj/build_runtime/V2H/libtvm_runtime.so /opt/poky/3.1.31/sysroots/aarch64-poky-linux/usr/lib64
-  exit
-  ```
+-  (12)-7 Run the following commands 
+  <span style="color: red;">in  docker container</span>
+    ```
+    export YOCTO_WORK="/drp-ai_tvm/yocto"
+    cp /drp-ai_tvm/obj/build_runtime/V2H/libtvm_runtime.so ${YOCTO_WORK:?}
+    cp /drp-ai_tvm/obj/build_runtime/V2H/libtvm_runtime.so /opt/poky/3.1.31/sysroots/aarch64-poky-linux/usr/lib64
+    exit
+    ```
 
 ### Make Yolo-planar-slam
-In case of using TVM version skip (13-a).
+>__In case of using TVM version skip (13-a).__
 
-- (13-a) yolo-planar-slam using AI translator
+- (13-a)<span style="color: red;"> yolo-planar-slam</span> using <span style="color: red;">AI translator</span>
   
 - (13-a)-1 Start docker container. 
 
@@ -387,7 +388,7 @@ In case of using TVM version skip (13-a).
   
 - (13-a)-2 Setup the environment for building application. 
 
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   export YOCTO_WORK="/drp-ai_tvm/yocto"
   cd ${YOCTO_WORK:?}/yolo-planar-slam
@@ -398,7 +399,7 @@ In case of using TVM version skip (13-a).
   
 - (13-a)-3Make yolo-planar-slam using AI translator. 
 
-  Run the following commands in docker container  
+  Run the following commands <span style="color: red;">in docker container</span>  
   ```
   mkdir build
   cd build
@@ -425,6 +426,7 @@ In case of using TVM version skip (13-a).
 
   Options of make_yolo-planar-slam-oca-trn.sh
   
+  ```
   cmake -DCMAKE_BUILD_TYPE=Release \
     -DENABLE_MEASURE_TIME=ON \
     -DENABLE_DUMP=OFF \
@@ -448,11 +450,13 @@ In case of using TVM version skip (13-a).
     -DYOLO_PLANAR_SLAM_VERSION=${YOLO_PLANAR_SLAM_VERSION} \
     ..
   make -j 
+  ```
 
   ***In case of Cudtom***
 
   Options of make_yolo-planar-slam-cus-trn.sh
 
+  ```
   cmake -DCMAKE_BUILD_TYPE=Release \
     -DENABLE_MEASURE_TIME=ON \
     -DENABLE_DUMP=OFF \
@@ -475,9 +479,10 @@ In case of using TVM version skip (13-a).
     -DYOLO_PLANAR_SLAM_VERSION=${YOLO_PLANAR_SLAM_VERSION} \
     ..
   make -j
+  ```
 
-In case of using AI translator version (13-b).
-- (13-b) yolo-planar-slam using TVM 
+>__In case of using AI translator version skip (13-b).__
+- (13-b) <span style="color: red;">yolo-planar-slam</span> using <span style="color: red;">TVM</span> 
 
 - (13-b)-1 Start docker container. 
 
@@ -489,7 +494,7 @@ In case of using AI translator version (13-b).
 
 - (13-b)-2 Setup the environment for building application. 
 
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   export YOCTO_WORK="/drp-ai_tvm/yocto"
   cd ${YOCTO_WORK:?}/yolo-planar-slam
@@ -500,7 +505,7 @@ In case of using AI translator version (13-b).
 
 - (13-b)-3 Add the include directories of TVM to the CMakeLists.txt. 
 
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   cat << 'EOS' | sed -i '121r /dev/stdin' ./CMakeLists.txt
   >>> set(TVM_ROOT $ENV{TVM_HOME})
@@ -516,7 +521,7 @@ In case of using AI translator version (13-b).
 
 - (13-b)-4 Check the CMakeLists.txt. 
   
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   egrep -A 8 -B 3 TVM_HOME CMakeLists.txt
 
@@ -536,7 +541,7 @@ In case of using AI translator version (13-b).
 
 - (13-b)-5 Make yolo-planar-slam using TVM.  
   
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   mkdir build
   cd build
@@ -574,7 +579,7 @@ In case of using AI translator version (13-b).
 
 - (14)-2 Setup the environment for building application. 
 
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   export YOCTO_WORK="/drp-ai_tvm/yocto"
   cd ${YOCTO_WORK:?}/stella_vslam
@@ -585,7 +590,7 @@ In case of using AI translator version (13-b).
 
 - (14)-3 Make a local directory. 
 
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   export CMAKE_INSTALL_PREFIX=${YOCTO_WORK:?}/local
   mkdir -p ${CMAKE_INSTALL_PREFIX:?}
@@ -593,7 +598,7 @@ In case of using AI translator version (13-b).
 
 - (14)-4 Clone the repository of g2o. 
 
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   cd ${YOCTO_WORK:?}
   
@@ -605,7 +610,7 @@ In case of using AI translator version (13-b).
 
 - (14)-5 Build g2o and independent of OpenGL and then install. 
 
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   mkdir -p build
   cd ./build
@@ -620,7 +625,7 @@ In case of using AI translator version (13-b).
 
 - (14)-6 Register as safe directories. 
 
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   cd ${YOCTO_WORK:?}/stella_vslam  
   git config --global --add safe.directory /drp-ai_tvm/yocto/stella_vslam
@@ -632,7 +637,7 @@ In case of using AI translator version (13-b).
 
 - (14)-7 Add the include directories of TVM to the CMakeLists.txt. 
 
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   cat << 'EOS' | sed -i '160r /dev/stdin' ./CMakeLists.txt
   >>> set(TVM_ROOT $ENV{TVM_HOME})
@@ -648,7 +653,7 @@ In case of using AI translator version (13-b).
 
 - (14)-8 Check the CMakeLists.txt. 
 
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   egrep -A 8 -B 3 TVM_HOME CMakeLists.txt
 
@@ -668,7 +673,7 @@ In case of using AI translator version (13-b).
 
 - (14)-9 Build stella_vslam and install. 
   
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   mkdir -p build
   cd ./build
@@ -680,7 +685,7 @@ In case of using AI translator version (13-b).
 
 - (14)-10 Clone the repository of socket_publisher. 
   
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   cd ${YOCTO_WORK:?}
   
@@ -691,14 +696,14 @@ In case of using AI translator version (13-b).
 
 - (14)-11 Add "SIOCLIENT_LIBRARY" to CMakeLists.txt. 
   
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   sed -i 's/find_package(sioclient REQUIRED)/find_package(sioclient REQUIRED)\n# Change SIOCLIENT_LIBRARY for BitBake\nset(SIOCLIENT_LIBRARY "sioclient")\n/g' CMakeLists.txt
   ```
   
 - (14)-12 Add the include directories of EIGEN3 and OpenCV to the CMakeLists.txt. 
 
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   cat << 'EOS' | sed -i '61r /dev/stdin' ./CMakeLists.txt
   >>> find_package(Eigen3 REQUIRED)
@@ -712,7 +717,7 @@ In case of using AI translator version (13-b).
 
 - (14)-13 Check the CMakeLists.txt. 
   
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   egrep -A 8 -B 3 "Eigen3" CMakeLists.txt
 
@@ -732,7 +737,7 @@ In case of using AI translator version (13-b).
 
 - (14)-14 Build socket_publisher and install. 
   
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   mkdir -p build
   cd build
@@ -744,7 +749,7 @@ In case of using AI translator version (13-b).
 
 - (14)-15 Register as safe directories. 
 
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   cd ${YOCTO_WORK:?}/stella_vslam_examples
   
@@ -757,7 +762,7 @@ In case of using AI translator version (13-b).
 
 - (14)-16 Add the include directories of TVM and EIGEN3 and OpenCV to the CMakeLists.txt. 
 
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   cat << 'EOS' | sed -i '17r /dev/stdin' ./CMakeLists.txt
   >>> set(TVM_ROOT $ENV{TVM_HOME})
@@ -779,7 +784,7 @@ In case of using AI translator version (13-b).
 
 - (14)-17 Check the CMakeLists.txt. 
   
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   egrep -A 14 -B 2 TVM_HOME CMakeLists.txt
   
@@ -803,18 +808,18 @@ In case of using AI translator version (13-b).
   ```
 
 - (14)-18 Build stella-slam-examples. 
-  
-  Run the following commands in docker container
-  ```
-  mkdir -p build
-  cd build
-  cp ../../script/make_stella-slam-examples-tvm.sh .
-  ./make_stella-slam-examples-tvm.sh
-  ```
+
+   Run the following commands <span style="color: red;">in docker container</span>
+    ```
+    mkdir -p build
+    cd build
+    cp ../../script/make_stella-slam-examples-tvm.sh .
+    ./make_stella-slam-examples-tvm.sh
+    ```
 
 - (14)-19 Install curl and download the orb_vocab.fbow. 
 
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   apt update
   apt install curl
@@ -891,7 +896,7 @@ In case of using AI translator version (13-b).
   [EuRoC MAV Dataset](https://projects.asl.ethz.ch/datasets/doku.php?id=kmavvisualinertialdatasets)<br>
   vicon_room1/V1_01_easy
   
-#### This dataset used for Yolo-planar-slam, in case of using Stella-vslam skip (17)-1-1.
+ >__This dataset used for Yolo-planar-slam, in case of using Stella-vslam skip (17)-1-1.__
   
 - (17)-1-1 downloading the dataset(TUM) and using the dataset. 
 
@@ -949,7 +954,7 @@ In case of using AI translator version (13-b).
   sync
   ```
 
-#### This dataset used for Stella-vslam, in case of using Yolo-planar-slam skip (17)-1-2.
+>__This dataset used for Stella-vslam, in case of using Yolo-planar-slam skip (17)-1-2.__
 
 - (17)-1-2 downloading dataset(TUM,EuRoC) and using the dataset.  
 
@@ -1132,6 +1137,7 @@ In case of using AI translator version (13-b).
 - (19) - 1. Run viewer server with <span style="color: red;">Term1. </span>
   
   ```
+  export HOME=/home/root
   cd $HOME/yolo-planar-slam/viewer
   node app.js
   ```
@@ -1193,7 +1199,7 @@ After editing software and build option, execute following command.
   docker start -i rzv2h_ai_sdk_container_slam_2.12.3
   ```
 
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   export YOCTO_WORK="/drp-ai_tvm/yocto"
   cd ${YOCTO_WORK}/yolo-planar-slam
@@ -1244,6 +1250,7 @@ After editing software and build option, execute following command.
   ```
   
   ```
+  export HOME=/home/root
   cd ${HOME}/yolo-planar-slam
   rm -r Examples build lib Thirdparty
   ```
@@ -1263,9 +1270,10 @@ After editing software and build option, execute following command.
   sync
   ```
 
-### Run Stella-vslam
+#### Run Stella-vslam
 - (21)-1 Run viewer server with <span style="color: red;">Term1</span>. 
   ```
+  export HOME=/home/root
   cd $HOME/socket_viewer
   node app.js
   ```
@@ -1279,9 +1287,12 @@ After editing software and build option, execute following command.
 - (21)-3 Launch <span style="color: red;">the browser on the PC side</span> and input [IP address of smarc board(eth0 192.xxx.xxx.xxx)]: 3001 <br>
   ![](./img/img12.png)
 
-### Execute AI-VSLAM
+#### Execute AI-VSLAM
 - (21)-4 Initialize and modify yaml file with <span style="color: red;">Term2</span>. 
-
+  ```
+  cd $HOME/stella_vslam_examples
+  source ./script/run_setenv_stella_slam.sh
+  ```
 - (21)-5 Run the following program. (Term2) 
   ```
   ./script/run_stella_vslam_examples.sh [1] [2] [3] [4]
@@ -1292,13 +1303,12 @@ After editing software and build option, execute following command.
   |[1]|[2]|[3]| [4] |
   | ---- | ---- |---- | ---- |
   | MODE | SLAM | Yolox-S | Viewer|
-  |0: Monocular : rgbd_dataset_freiburg3_walking_halfsphere<br>1: Monocular : ELP USB Camera <span style="color: red;">*1</span><br>2: RGB-D      : rgbd_dataset_freiburg3_walking_halfsphere<br>
-  3: Stereo       : V1_01_easy| 0: CPU<br>1: OpenCVA(DRP)<br>2: Custom(DRP)|0: ------ <span style="color: red;">*2</span><br>1: DRPAI| : OFF<br>1: ON|
+  |0: Monocular : rgbd_dataset_freiburg3_walking_halfsphere<br>1: Monocular : ELP USB Camera <span style="color: red;">*1</span><br>2: RGB-D      : rgbd_dataset_freiburg3_walking_halfsphere<br>3: Stereo       : V1_01_easy| 0: CPU<br>1: OpenCVA(DRP)<br>2: Custom(DRP)|0: ------ <span style="color: red;">*2</span><br>1: DRPAI| : OFF<br>1: ON|
 
   *1. It is necessary to use parameters that have been calibrated for the camera.<br>Change "ELP_rns-2022-0901.yaml" to the calibrated parameters.  (Refer to SoCDD-08466-02_RZV2H_AI_VSLAM_InstallGuid.)<br>
   *2. Yolox-s does not run on either the CPU or the DRPAI.
 
-### Browser
+#### Browser
 - (21)-6 Browser 
    ![](./img/img13.png)
    ![](./img/img14.png)
@@ -1319,7 +1329,7 @@ After editing software and build option, execute following command.
   docker start -i rzv2h_ai_sdk_container_slam_2.12.3
   ```
   
-  Run the following commands in docker container
+  Run the following commands <span style="color: red;">in docker container</span>
   ```
   export YOCTO_WORK="/drp-ai_tvm/yocto"
   cd ${YOCTO_WORK}/stella_vslam
@@ -1360,6 +1370,7 @@ After editing software and build option, execute following command.
   ```
   
   ```
+  export HOME=/home/root
   cd ${HOME}/stella_vslam
   rm -r example
   
