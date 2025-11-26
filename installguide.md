@@ -310,11 +310,12 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   - <span style="color: red;">__core-image-weston-rzv2h-evk-ver1.wic.gz__</span>
   
   >[!WARINIG]
-  *The bitbake may occur errors due to lack of memory.<br>*
-  *In that case, reduce the number of cores by adding the following command to local.conf. This is an example with 2 cores．<br>* 
-  *build/conf/local.conf<br>*
-  *BB_NUMBER_THREADS = '2'<br>*
-  *PARALLEL_MAKE = '-j 2'<br>*
+  >'The bitbake' may occur errors due to lack of memory.<br>
+  >*In that case, reduce the number of cores by adding the following command to local.conf. This is an example with 2 cores．<br>* 
+  
+  >*build/conf/local.conf<br>*
+  >*BB_NUMBER_THREADS = '2'<br>*
+  >*PARALLEL_MAKE = '-j 2'<br>*
 
 <a id="step1-12"></a>
 
