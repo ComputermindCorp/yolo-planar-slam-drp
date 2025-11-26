@@ -60,7 +60,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 <br>
 
 ## [STEP-1]<br>Build Linux Environment<br>
-  ![](./img/img3.png)
+  <img src="./img/img3.png" width="300">
 
   - (1) [Download RZ/V2H AI SDK Source Code](#step1-1)
   - (2) [Deploy the files of RZ/V2H AI SDK and vslam](#step1-2)
@@ -79,14 +79,14 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   - (15) [CMake/Make application (Stella-vslam)](#step1-15)
 
 ## [STEP-2] <br>Prepare a micro SD card to boot Linux<br>
-  ![](./img/img4.png)
+  <img src="./img/img4.png" width="300">
   
   - (16) [Prepare microSD Card](#step2-1)
   - (17) [Write image to microSD](#step2-2)
   - (18) [Write SLAM Script/Dataset/Application](#step2-3)
 
 ## [STEP-3] <br>Execute DRP-AI sample application<br>
-  ![](./img/img5.png)
+  <img src="./img/img5.png" width="300">
 
   - (19) [Start EVK board and VSLAM application](#step3-1)
   - (20) [Execute Yolo-planar-slam](#step3-2) 
@@ -309,9 +309,9 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   - <span style="color: red;">__core-image-weston-rzv2h-evk-ver1.wic.bmap__</span>
   - <span style="color: red;">__core-image-weston-rzv2h-evk-ver1.wic.gz__</span>
   
+  >[!WARINIG]
   *The bitbake may occur errors due to lack of memory.<br>*
   *In that case, reduce the number of cores by adding the following command to local.conf. This is an example with 2 cores．<br>* 
-  
   *build/conf/local.conf<br>*
   *BB_NUMBER_THREADS = '2'<br>*
   *PARALLEL_MAKE = '-j 2'<br>*
