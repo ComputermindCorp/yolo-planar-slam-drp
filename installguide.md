@@ -90,11 +90,11 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 ## [STEP-3] <br>Execute DRP-AI sample application<br>
 
-  - (19) [Start EVK board and VSLAM application](#step3-1)
-  - (20) [Execute Yolo-planar-slam](#step3-2) 
-  - (21) [Re-build AI-VSLAM application](#step3-3)
-  - (22) [Execute Stella-vslam](#step3-4)
-  - (23) [Re-build AI-VSLAM application](#step3-5)
+  - (18) [Start EVK board and VSLAM application](#step3-1)
+  - (19) [Execute Yolo-planar-slam](#step3-2) 
+  - (20) [Re-build AI-VSLAM application](#step3-3)
+  - (21) [Execute Stella-vslam](#step3-4)
+  - (22) [Re-build AI-VSLAM application](#step3-5)
 
 ## Build Instructions
   <img src="./img/img3.png" width="300">
@@ -247,7 +247,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 <a id="step1-8"></a>
 
-### (8) Run the following commands to extract the OSS package. <br>Build the target file system image using bitbake.
+### (8) Run the following commands to extract the OSS package
   ```
   cp ${WORK}/src_setup/oss_pkg_rzv_*.7z ${YOCTO_WORK}
   7z x ${YOCTO_WORK}/oss_pkg_rzv_*.7z -o${YOCTO_WORK}/build
@@ -416,7 +416,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 ### In case of using TVM version skip (14-a).
 
-- (14-a)<span style="color: red;"> __yolo-planar-slam__</span> using <span style="color: red;">__AI translator__</span>
+- (13-a)<span style="color: red;"> __yolo-planar-slam__</span> using <span style="color: red;">__AI translator__</span>
   
 ### (13-a)-1 Start docker container. 
 
@@ -480,7 +480,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   ```
 
 ### In case of using AI translator version skip (14-b).
-- (14-b) <span style="color: red;">__yolo-planar-slam__</span> using <span style="color: red;">__TVM__</span> 
+- (13-b) <span style="color: red;">__yolo-planar-slam__</span> using <span style="color: red;">__TVM__</span> 
 
 ### (13-b)-1 Start docker container. 
 
@@ -842,7 +842,9 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 ## 2. Prepare microSD card to boot Linux
   <img src="./img/img4.png" width="300">
+
 <a id="step2-1"></a>
+
 ### (15) Prepare a microSD Card 
         
   To boot from microSD Card, over <span style="color: red;">__32GB__ </span >capacity of blank microSD card is needed, Please use Linux Host PC to write image data using USB card reader or other equipment.<br>
@@ -870,7 +872,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   sudo bmaptool copy --bmap core-image-weston-rzv2h-evk-ver1.wic.bmap core-image-weston-rzv2h-evk-ver1.wic.gz /dev/sdc
   ```
 
-### (16)-4 Mount microSD Card. The name and the place of the mount directory can be changed as必要に応じて変更できます。 
+### (16)-4 Mount microSD Card. The name and the place of the mount directory can be changed as necessary. 
   
   Run the following commands on your Linux PC.
   ```
