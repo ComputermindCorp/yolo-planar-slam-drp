@@ -59,8 +59,9 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 <br>
 
+<a id="step1"></a>
+
 ## [STEP-1]<br>Build Linux Environment<br>
-  <img src="./img/img3.png" width="300">
 
   - (1) [Download RZ/V2H AI SDK Source Code](#step1-1)
   - (2) [Deploy the files of RZ/V2H AI SDK and vslam](#step1-2)
@@ -69,24 +70,25 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   - (5) [Initialize a build using the 'oe-init-build-env' script in Poky](#step1-5)
   - (6) [Add layer Graphics Library, drpai, opencva, etc.](#step1-6)
   - (7) [Change the size of the microSD card image in WIC format](#step1-7)
-  - (8) [Extract the OSS package for yocto build](#step1-8)
-  - (9) [Bitbake the Image](#step1-9)
-  - (10) [Add SLAM recipe](#step1-10)
-  - (11) [Bitbake the Image](#step1-11)
-  - (12) [Build the target SDK](#step1-12)
-  - (13) [Setup SDK in Docker](#step1-13)
-  - (14) [CMake/Make application (Yolo-planar-slam)](#step1-14)
-  - (15) [CMake/Make application (Stella-vslam)](#step1-15)
+  - (8) [Bitbake the Image](#step1-8)
+  - (9) [Add SLAM recipe](#step1-9)
+  - (10) [Bitbake the Image](#step1-10)
+  - (11) [Build the target SDK](#step1-11)
+  - (12) [Setup SDK in Docker](#step1-12)
+  - (13) [CMake/Make application (Yolo-planar-slam)](#step1-13)
+  - (14) [CMake/Make application (Stella-vslam)](#step1-14)
+
+<a id="step2"></a>
 
 ## [STEP-2] <br>Prepare a micro SD card to boot Linux<br>
-  <img src="./img/img4.png" width="300">
   
-  - (16) [Prepare microSD Card](#step2-1)
-  - (17) [Write image to microSD](#step2-2)
-  - (18) [Write SLAM Script/Dataset/Application](#step2-3)
+  - (15) [Prepare microSD Card](#step2-1)
+  - (16) [Write image to microSD](#step2-2)
+  - (17) [Write SLAM Script/Dataset/Application](#step2-3)
+
+<a id="step3"></a>
 
 ## [STEP-3] <br>Execute DRP-AI sample application<br>
-  <img src="./img/img5.png" width="300">
 
   - (19) [Start EVK board and VSLAM application](#step3-1)
   - (20) [Execute Yolo-planar-slam](#step3-2) 
@@ -95,7 +97,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   - (23) [Re-build AI-VSLAM application](#step3-5)
 
 ## Build Instructions
-
+  <img src="./img/img3.png" width="300">
 <a id="step1-1"></a>
 
 ###  (1) Download RZ/V2H AI SDK Source Code
@@ -245,8 +247,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 <a id="step1-8"></a>
 
-### (8) Run the following commands to extract the OSS package to the ${YOCTO_WORK}/build directory.
-
+### (8) Run the following commands to extract the OSS package. <br>Build the target file system image using bitbake.
   ```
   cp ${WORK}/src_setup/oss_pkg_rzv_*.7z ${YOCTO_WORK}
   7z x ${YOCTO_WORK}/oss_pkg_rzv_*.7z -o${YOCTO_WORK}/build
@@ -255,19 +256,15 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
       downloads
   ```
 
-<a id="step1-9"></a>
-
-### (9) Build the target file system image using bitbake.
-  
   Run the commands on your Linux PC below to start a build. Building an image can take up to a few hours depending on the user’s host system performance.
   ```
   cd ${YOCTO_WORK}/build
   MACHINE=rzv2h-evk-ver1 bitbake core-image-weston
   ```
 
-<a id="step1-10"></a>
+<a id="step1-9"></a>
 
-### (10) Add SLAM recipe 
+### (9) Add SLAM recipe 
   
   Run the following commands on your Linux PC.
 
@@ -295,7 +292,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   
 <a id="step1-11"></a>
 
-### (11) Build the target file system image using bitbake. 
+### (10) Build the target file system image using bitbake. 
 
   Run the following commands on your Linux PC.
   ```
@@ -309,17 +306,19 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   - <span style="color: red;">__core-image-weston-rzv2h-evk-ver1.wic.bmap__</span>
   - <span style="color: red;">__core-image-weston-rzv2h-evk-ver1.wic.gz__</span>
   
-  >[!WARINIG]
-  >'The bitbake' may occur errors due to lack of memory.<br>
-  >*In that case, reduce the number of cores by adding the following command to local.conf. This is an example with 2 cores．<br>* 
   
-  >*build/conf/local.conf<br>*
-  >*BB_NUMBER_THREADS = '2'<br>*
-  >*PARALLEL_MAKE = '-j 2'<br>*
+ > The bitbake may occur errors due to lack of memory.<br>
+  *In that case, reduce the number of cores by adding the following command to local.conf. This is an example with 2 cores．<br>* 
+
+  ```
+  build/conf/local.conf<br>
+  BB_NUMBER_THREADS = '2'<br>
+  PARALLEL_MAKE = '-j 2'<br>
+  ```
 
 <a id="step1-12"></a>
 
-### (12) Build the target SDK
+### (11) Build the target SDK
 
   Run the following commands on your Linux PC.
   ```
@@ -333,7 +332,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   - <span style="color: red;">__poky-glibc-x86_64-core-image-weston-aarch64-rzv2h-evk-ver1-toolchain-3.1.31.sh__</span> : Cross compiler installer
 
 <a id="step1-13"></a>
-### (13)-1 Register the working and setup directory path to an environment variable.
+### (12)-1 Register the working and setup directory path to an environment variable.
   
   Run the following commands on your Linux PC.
   ```
@@ -341,7 +340,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   export AI_SDK_WORK=${WORK}/ai_sdk_work
   ```
 
-### (13)-2  Copy the script of make*.sh to ${YOCTO_WORK}/script directory.
+### (12)-2  Copy the script of make*.sh to ${YOCTO_WORK}/script directory.
 
   Run the following commands on your Linux PC.
 
@@ -351,7 +350,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   cp ${WORK}/src_setup/yolo-planar-slam-drp/setup_files/make*.sh ./script/
   ```
 
-### (13)-3 Download RZ/V2H AI SDK and extract AI SDK.
+### (12)-3 Download RZ/V2H AI SDK and extract AI SDK.
 
   Refer the link below
   [Download Link.](https://www.renesas.com/en/document/sws/rzv2h-ai-sdk-v520)
@@ -374,7 +373,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   
 #### Make sure that you have installed Docker  on your Linux PC.
 
-### (13)-4 Move to the working directory and change to Cross Compiler installer builded by this Guide.
+### (12)-4 Move to the working directory and change to Cross Compiler installer builded by this Guide.
 
   Run the following commands on your Linux PC.
 
@@ -384,7 +383,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   cp ${YOCTO_WORK}/build/tmp/deploy/sdk/poky-glibc-x86_64-core-image-weston-aarch64-rzv2h-evk-ver1-toolchain-3.1.31.sh .
   ```
 
-### (13)-5 Build docker image and check docker images. 
+### (12)-5 Build docker image and check docker images. 
   
   ```
   docker build -t rzv2h_ai_sdk_image:slam_2.12.3 --build-arg SDK="/opt/poky/3.1.31" --build-arg PRODUCT="V2H" .
@@ -395,7 +394,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   |----|----|----|----|----|
   |rzv2h_ai_sdk_image|slam_2.12.3|xxxxxxxxxxxx|About a minute ago| 25.2GB|
   
-### (13)-6 Create docker container.
+### (12)-6 Create docker container.
   ```
   cd ${AI_SDK_WORK}/ai_sdk_setup
   docker run -it --name rzv2h_ai_sdk_container_slam_2.12.3 -v ${YOCTO_WORK}:/drp-ai_tvm/yocto rzv2h_ai_sdk_image:slam_2.12.3
@@ -403,7 +402,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   
   In docker container, run the following command to copy libtvm_runtime.so, which is the necessary file for the board and Cross Compiler environment. 
   
-### (13)-7 Run the following commands <span style="color: red;"> __in  docker container__ </span>
+### (12)-7 Run the following commands <span style="color: red;"> __in  docker container__ </span>
     ```
     export YOCTO_WORK="/drp-ai_tvm/yocto"
     cp /drp-ai_tvm/obj/build_runtime/V2H/libtvm_runtime.so ${YOCTO_WORK:?}
@@ -419,7 +418,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 - (14-a)<span style="color: red;"> __yolo-planar-slam__</span> using <span style="color: red;">__AI translator__</span>
   
-### (14-a)-1 Start docker container. 
+### (13-a)-1 Start docker container. 
 
   Run the following commands on your Linux PC.
   ```
@@ -428,7 +427,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   docker start -i rzv2h_ai_sdk_container_slam_2.12.3
   ```
   
-### (14-a)-2 Setup the environment for building application. 
+### (13-a)-2 Setup the environment for building application. 
 
   Run the following commands <span style="color: red;"> __in docker container__ </span>
   ```
@@ -439,7 +438,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   source script/setup.sh
   ```
   
-### (14-a)-3Make yolo-planar-slam using AI translator. 
+### (13-a)-3Make yolo-planar-slam using AI translator. 
 
   Run the following commands <span style="color: red;"> __in docker container__  </span>
   ```
@@ -483,7 +482,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 ### In case of using AI translator version skip (14-b).
 - (14-b) <span style="color: red;">__yolo-planar-slam__</span> using <span style="color: red;">__TVM__</span> 
 
-### (14-b)-1 Start docker container. 
+### (13-b)-1 Start docker container. 
 
   Run the following commands on your Linux PC.
   ```
@@ -491,7 +490,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   docker start -i rzv2h_ai_sdk_container_slam_2.12.3
   ```
 
-### (14-b)-2 Setup the environment for building application. 
+### (13-b)-2 Setup the environment for building application. 
 
   Run the following commands <span style="color: red;"> __in docker container__ </span>
   ```
@@ -502,7 +501,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   source script/setup.sh
   ```
 
-### (14-b)-3 Add the include directories of TVM to the CMakeLists.txt. 
+### (13-b)-3 Add the include directories of TVM to the CMakeLists.txt. 
 
   Run the following commands <span style="color: red;"> __in docker container__ </span>
   ```
@@ -518,7 +517,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
       EOS
   ```
 
-### (14-b)-4 Check the CMakeLists.txt. 
+### (13-b)-4 Check the CMakeLists.txt. 
   
   Run the following commands <span style="color: red;"> __in docker container__ </span>
   ```
@@ -538,7 +537,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
       include_directories(
   ```
 
-### (14-b)-5 Make yolo-planar-slam using TVM.  
+### (13-b)-5 Make yolo-planar-slam using TVM.  
   
   Run the following commands <span style="color: red;">__in docker container__ </span>
   ```
@@ -568,9 +567,9 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 ## Make Stella-vslam
 
-### (15) Make stella_vslam using TVM. 
+### (14) Make stella_vslam using TVM. 
 
-### (15)-1 Start docker container. 
+### (14)-1 Start docker container. 
 
   Run the following commands on your Linux PC.
   ```
@@ -578,7 +577,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   docker start -i rzv2h_ai_sdk_container_slam_2.12.3
   ```
 
-### (15)-2 Setup the environment for building application. 
+### (14)-2 Setup the environment for building application. 
 
   Run the following commands <span style="color: red;"> __in docker container__ </span>
   ```
@@ -589,7 +588,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   source scripts/setup.sh
   ```
 
-### (15)-3 Make a local directory. 
+### (14)-3 Make a local directory. 
 
   Run the following commands <span style="color: red;"> __in docker container__ </span>
   ```
@@ -597,7 +596,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   mkdir -p ${CMAKE_INSTALL_PREFIX:?}
   ```
 
-### (15)-4 Clone the repository of g2o. 
+### (14)-4 Clone the repository of g2o. 
 
   Run the following commands <span style="color: red;"> __in docker container__ </span>
   ```
@@ -609,7 +608,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   git checkout ${G2O_COMMIT}
   ```
 
-### (15)-5 Build g2o and independent of OpenGL and then install. 
+### (14)-5 Build g2o and independent of OpenGL and then install. 
 
   Run the following commands <span style="color: red;"> __in docker container__ </span>
   ```
@@ -624,7 +623,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   make install
   ```
 
-### (15)-6 Register as safe directories. 
+### (14)-6 Register as safe directories. 
 
   Run the following commands <span style="color: red;"> __in docker container__ </span>
   ```
@@ -636,7 +635,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   git submodule update --init
   ```
 
-### (15)-7 Add the include directories of TVM to the CMakeLists.txt. 
+### (14)-7 Add the include directories of TVM to the CMakeLists.txt. 
 
   Run the following commands <span style="color: red;"> __in docker container__ </span>
   ```
@@ -652,7 +651,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
       EOS
   ```
 
-### (15)-8 Check the CMakeLists.txt. 
+### (14)-8 Check the CMakeLists.txt. 
 
   Run the following commands <span style="color: red;"> __in docker container__ </span>
   ```
@@ -672,7 +671,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
       ----- Build -----
   ```
 
-### (15)-9 Build stella_vslam and install. 
+### (14)-9 Build stella_vslam and install. 
   
   Run the following commands <span style="color: red;">__in docker container__</span>
   ```
@@ -684,7 +683,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   make install
   ```
 
-### (15)-10 Clone the repository of socket_publisher. 
+### (14)-10 Clone the repository of socket_publisher. 
   
   Run the following commands <span style="color: red;">__in docker container__</span>
   ```
@@ -695,14 +694,14 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   cd ${YOCTO_WORK:?}/socket_publisher
   ```
 
-### (15)-11 Add "SIOCLIENT_LIBRARY" to CMakeLists.txt. 
+### (14)-11 Add "SIOCLIENT_LIBRARY" to CMakeLists.txt. 
   
   Run the following commands <span style="color: red;"> __in docker container__ </span>
   ```
   sed -i 's/find_package(sioclient REQUIRED)/find_package(sioclient REQUIRED)\n# Change SIOCLIENT_LIBRARY for BitBake\nset(SIOCLIENT_LIBRARY "sioclient")\n/g' CMakeLists.txt
   ```
   
-### (15)-12 Add the include directories of EIGEN3 and OpenCV to the CMakeLists.txt. 
+### (14)-12 Add the include directories of EIGEN3 and OpenCV to the CMakeLists.txt. 
 
   Run the following commands <span style="color: red;">__in docker container__</span>
   ```
@@ -716,7 +715,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
       EOS
   ```
 
-### (15)-13 Check the CMakeLists.txt. 
+### (14)-13 Check the CMakeLists.txt. 
   
   Run the following commands <span style="color: red;">__in docker container__ </span>
   ```
@@ -736,7 +735,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
           stella_vslam::stella_vslam
   ```
 
-### (15)-14 Build socket_publisher and install. 
+### (14)-14 Build socket_publisher and install. 
   
   Run the following commands <span style="color: red;">__in docker container__</span>
   ```
@@ -748,7 +747,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   make install
   ```
 
-### (15)-15 Register as safe directories. 
+### (14)-15 Register as safe directories. 
 
   Run the following commands <span style="color: red;">__in docker container__</span>
   ```
@@ -761,7 +760,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   git submodule update --init
   ```
 
-### (15)-16 Add the include directories of TVM and EIGEN3 and OpenCV to the CMakeLists.txt. 
+### (14)-16 Add the include directories of TVM and EIGEN3 and OpenCV to the CMakeLists.txt. 
 
   Run the following commands <span style="color: red;">__in docker container__</span>
   ```
@@ -783,7 +782,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
       EOS
   ```
 
-### (15)-17 Check the CMakeLists.txt. 
+### (14)-17 Check the CMakeLists.txt. 
   
   Run the following commands <span style="color: red;"> __in docker container__ </span>
   ```
@@ -808,9 +807,10 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
       filesystem
   ```
 
-### (15)-18 Build stella-slam-examples. 
+### (14)-18 Build stella-slam-examples. 
 
    Run the following commands <span style="color: red;">__in docker container__</span>
+
     ```
     mkdir -p build
     cd build
@@ -818,7 +818,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
     ./make_stella-slam-examples-tvm.sh
     ```
 
-### (15)-19 Install curl and download the orb_vocab.fbow. 
+### (14)-19 Install curl and download the orb_vocab.fbow. 
 
   Run the following commands <span style="color: red;">__in docker container__</span>
   ```
@@ -841,27 +841,28 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   ```
 
 ## 2. Prepare microSD card to boot Linux
+  <img src="./img/img4.png" width="300">
 <a id="step2-1"></a>
-### (16) Prepare a microSD Card 
+### (15) Prepare a microSD Card 
         
   To boot from microSD Card, over <span style="color: red;">__32GB__ </span >capacity of blank microSD card is needed, Please use Linux Host PC to write image data using USB card reader or other equipment.<br>
   Please write image data to your microSD Card according to the following steps.
 
 <a id="step2-2"></a>
 
-### (17)-1 Install Necessary Software  
+### (16)-1 Install Necessary Software  
   
   Run the following commands on your Linux PC.
   ```
   sudo apt install bmap-tools
   ```
 
-### (17)-2 Write image to microSD card 
+### (16)-2 Write image to microSD card 
   
   Here, we use "<span style="color: red;">__/dev/sdc__</span>" as microSD card device name.<br>
   <span style="color: red;">__"/dev/sdc" needs to be changed according to your environment of Ubuntu PC.__</span>
   
-### (17)-3 Write the image file to microSD 
+### (16)-3 Write the image file to microSD 
   
   Run the following commands on your Linux PC.
   ```
@@ -869,7 +870,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   sudo bmaptool copy --bmap core-image-weston-rzv2h-evk-ver1.wic.bmap core-image-weston-rzv2h-evk-ver1.wic.gz /dev/sdc
   ```
 
-### (17)-4 Mount microSD Card. The name and the place of the mount directory can be changed as necessary. 
+### (16)-4 Mount microSD Card. The name and the place of the mount directory can be changed as必要に応じて変更できます。 
   
   Run the following commands on your Linux PC.
   ```
@@ -879,7 +880,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   sudo mount -t ext4 /dev/sdc2 $SD_EXT4
   ```
 
-### (17)-5 Write libtvm_runtime.so to microSD 
+### (16)-5 Write libtvm_runtime.so to microSD 
   
   Run the following commands on your Linux PC. 
   ```
@@ -888,7 +889,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 <a id="step2-3"></a>
 
-### (18)-1-0 Dataset 
+### (17)-1-0 Dataset 
 
   The dataset can be downloaded from the following site.
   Check the license etc.
@@ -903,9 +904,9 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   
  ### This dataset used for Yolo-planar-slam, in case of using Stella-vslam skip (18)-1-1.
   
-### (18)-1-1 downloading the dataset(TUM) and using the dataset. 
+### (17)-1-1 downloading the dataset(TUM) and using the dataset. 
 
-### (18)-1-1a Download Dataset(rgbd_dataset_freiburg3_walking_xyz.tgz) for Yolo-planar-slam. 
+### (17)-1-1a Download Dataset(rgbd_dataset_freiburg3_walking_xyz.tgz) for Yolo-planar-slam. 
   
   Run the following commands on your Linux PC.
   ```
@@ -918,7 +919,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   wget https://svncvpr.in.tum.de/cvpr-ros-pkg/trunk/rgbd_benchmark/rgbd_benchmark_tools/src/rgbd_benchmark_tools/associate.py
   ```
 
-### (18)-1-1b Run associate.py to make associate.txt. 
+### (17)-1-1b Run associate.py to make associate.txt. 
 
   Run the following commands on your Linux PC.
   ```
@@ -931,7 +932,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   python2 associate.py ${DATASET}/rgb.txt ${DATASET}/depth.txt > associate.txt
   ```
 
-### (18)-1-1c Convert rgbd_dataset_freiburg3_walking_xyz to make GRAY_rgbd_dataset_freiburg3_walking_xyz. 
+### (17)-1-1c Convert rgbd_dataset_freiburg3_walking_xyz to make GRAY_rgbd_dataset_freiburg3_walking_xyz. 
   
   Run the following commands on your Linux PC.
   ```
@@ -945,7 +946,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   cd ../..
   ```
 
-### (18)-1-1d Write Dataset files to the microSD 
+### (17)-1-1d Write Dataset files to the microSD 
 
   Run the following commands on your Linux PC.
   ```
@@ -961,9 +962,9 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 ### This dataset used for Stella-vslam, in case of using Yolo-planar-slam skip (18)-1-2.
 
-### (18)-1-2 downloading dataset(TUM,EuRoC) and using the dataset.  
+### (17)-1-2 downloading dataset(TUM,EuRoC) and using the dataset.  
 
-### (18)-1-2a Download Dataset(rgbd_dataset_freiburg3_walking_xyz.tgz, V1_01_easy.zip) for Stella-vslam. 
+### (17)-1-2a Download Dataset(rgbd_dataset_freiburg3_walking_xyz.tgz, V1_01_easy.zip) for Stella-vslam. 
   
   Run the following commands on your Linux PC.
   ```
@@ -977,7 +978,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   wget http://robotics.ethz.ch/~asl-datasets/ijrr_euroc_mav_dataset/vicon_room1/V1_01_easy/V1_01_easy.zip
   ```
 
-### (18)-1-2b Run associate.py to make associate.txt. 
+### (17)-1-2b Run associate.py to make associate.txt. 
   
   Run the following commands on your Linux PC.
   ```
@@ -987,7 +988,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   python2 associate.py ${DATASET}/rgb.txt ${DATASET}/depth.txt > associate.txt
   ```
 
-### (18)-1-2c Write Dataset files to the microSD 
+### (17)-1-2c Write Dataset files to the microSD 
   
   Run the following commands on your Linux PC.
   ```
@@ -1003,7 +1004,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   sync
   ```
 
-### (18)-2 Write files to the microSD 
+### (17)-2 Write files to the microSD 
   
   Yolo-planar-slam execution file and viewer and so on<br>
   Run the following commands on your Linux PC.
@@ -1027,7 +1028,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   sync
   ```
 
-### (18)-3 Write files to the card 
+### (17)-3 Write files to the card 
   
   Stella_vslam execution file and viewer and so on<br>
   Run the following commands on your Linux PC.
@@ -1049,14 +1050,14 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   sync
   ```
 
-### (18)-4 Make eval directory 
+### (17)-4 Make eval directory 
 
   Run the following commands on your Linux PC.
   ```
   sudo mkdir -p ${SD_EXT4}/home/root/stella_vslam_examples/eval
   ```
 
-### (18)-5 Write files to the card 
+### (17)-5 Write files to the card 
   
   Viewer for Stella-vslam<br>
   Run the following commands on your Linux PC.
@@ -1075,7 +1076,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   sync
   ```
 
-### (18)-6 Unmount microSD Card 
+### (17)-6 Unmount microSD Card 
   
   Run the following commands on your Linux PC.
   ```
@@ -1089,13 +1090,13 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 <a id="step3-1"></a>
 
-### (19)-1 Power OFF(SW2:OFF, SW3:OFF)  
-### (19)-2 Connect equipment (see right the figure) 
-### (19)-3 Change DSw1 and DSW2 setting as shown in the figure. <br>
+### (18)-1 Power OFF(SW2:OFF, SW3:OFF)  
+### (18)-2 Connect equipment (see right the figure) 
+### (18)-3 Change DSw1 and DSW2 setting as shown in the figure. <br>
          Attach microSD Card 
-### (19)-4 Turn the SW3 ON. 
-### (19)-5 Turn the SW2 ON. 
-### (19)-6 After the Boot-up, open terminal app. 
+### (18)-4 Turn the SW3 ON. 
+### (18)-5 Turn the SW2 ON. 
+### (18)-6 After the Boot-up, open terminal app. 
 
    Terminal app setting
    - speed	: 115200bps
@@ -1118,11 +1119,11 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   4.Turn the SW3 OFF.
 
 #### Linux boot and Login
-### (19)-7 Login as root <br>
+### (18)-7 Login as root <br>
   ![](./img/img7.png)
 
 #### Terminal with SSH
-### (19)-8 Check the IP address of eth0(EVK) with ifconfig. 
+### (18)-8 Check the IP address of eth0(EVK) with ifconfig. 
   
   Run the following commands on board console.
   ```
@@ -1131,7 +1132,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
            inet addr:192.xxx.xxx.xxx Bcast:xxx.xxx.xxx.xxx  Mask:xxx.xxx.xxx.xxx
   ```
 
-### (19)-9 Open two Terminals of TeraTerm with SSH. (Term1,Term2) 
+### (18)-9 Open two Terminals of TeraTerm with SSH. (Term1,Term2) 
 
   User name: <span style="color: red;">__root__</span><br>
   Passphrase: <span style="color: red;">__(blank)__</span>
@@ -1143,7 +1144,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 #### Run viewer
 
-### (20) - 1. Run viewer server with <span style="color: red;">__Term1.__</span>
+### (19) - 1. Run viewer server with <span style="color: red;">__Term1.__</span>
   
   ```
   export HOME=/home/root
@@ -1151,25 +1152,25 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   node app.js
   ```
 
-### (20)-2 The following message is displayed. (Term1) 
+### (19)-2 The following message is displayed. (Term1) 
 
   ```
   WebSocket: listening on *:3000
   HTTP server: listening on *:3001
   ```
 
-### (20)-3 Launch <span style="color: red;">__the browser on the PC side__</span> and input [IP address of smarc board(eth0 192.xxx.xxx.xxx)]: 3001 <br>
+### (19)-3 Launch <span style="color: red;">__the browser on the PC side__</span> and input [IP address of smarc board(eth0 192.xxx.xxx.xxx)]: 3001 <br>
   ![](./img/img9.png)
 
 #### Execute AI-VSLAM
 
-### (20)-4 Initialize and modify yaml file with <span style="color: red;">__Term2__</span>. 
+### (19)-4 Initialize and modify yaml file with <span style="color: red;">__Term2__</span>. 
   ```
   cd $HOME/yolo-planar-slam
   source ./script/run_setenv_planar_slam.sh
   ```
 
-### (20)-5 Run the following program. (Term2) 
+### (19)-5 Run the following program. (Term2) 
   ```
   ./script/run_planar_vslam.sh [1] [2] [3]
   ```
@@ -1189,7 +1190,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   *3. It is necessary to build yolo-planar-slam with option "-DENABLE_SLAMFAST=ON" of make_yolo-planar-slam-cus-xxx.sh.
 
 #### Browser
-### (20)-6 Browser 
+### (19)-6 Browser 
    ![](./img/img10.png)
    ![](./img/img11.png)
 
@@ -1198,7 +1199,8 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 After editing software and build option, execute following command.
 
 <a id="step3-3"></a>
-### (21) Re-build AI-VSLAM application 
+
+### (20) Re-build AI-VSLAM application 
   
   Run the following commands on your Linux PC.
   ```
@@ -1285,29 +1287,29 @@ After editing software and build option, execute following command.
 
 ### Run Stella-vslam
 
-### (22)-1 Run viewer server with <span style="color: red;">__Term1__</span>. 
+### (21)-1 Run viewer server with <span style="color: red;">__Term1__</span>. 
   ```
   export HOME=/home/root
   cd $HOME/socket_viewer
   node app.js
   ```
 
-### (22)-2 The following message is displayed. (Term1) 
+### (21)-2 The following message is displayed. (Term1) 
   ```
   WebSocket: listening on *:3000
   HTTP server: listening on *:3001
   ```
 
-### (22)-3 Launch <span style="color: red;">__the browser on the PC side__</span> and input [IP address of smarc board(eth0 192.xxx.xxx.xxx)]: 3001 <br>
+### (21)-3 Launch <span style="color: red;">__the browser on the PC side__</span> and input [IP address of smarc board(eth0 192.xxx.xxx.xxx)]: 3001 <br>
   ![](./img/img12.png)
 
 #### Execute AI-VSLAM
-### (22)-4 Initialize and modify yaml file with <span style="color: red;">__Term2__</span>. 
+### (21)-4 Initialize and modify yaml file with <span style="color: red;">__Term2__</span>. 
   ```
   cd $HOME/stella_vslam_examples
   source ./script/run_setenv_stella_slam.sh
   ```
-### (22)-5 Run the following program. (Term2) 
+### (21)-5 Run the following program. (Term2) 
   ```
   ./script/run_stella_vslam_examples.sh [1] [2] [3] [4]
   ```
@@ -1323,7 +1325,7 @@ After editing software and build option, execute following command.
   *2. Yolox-s does not run on either the CPU or the DRPAI.
 
 #### Browser
-### (22)-6 Browser 
+### (21)-6 Browser 
    ![](./img/img13.png)
    ![](./img/img14.png)
 
@@ -1331,7 +1333,7 @@ After editing software and build option, execute following command.
 **<span style="color: red;">Open new terminal.</span>**<br>
 After editing software and build option, execute following command.
 <a id="step3-5"></a>
-### (23) Re-build AI-VSLAM application
+### (22) Re-build AI-VSLAM application
   
   Run the following commands on your Linux PC.
   ```
