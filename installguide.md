@@ -5,7 +5,7 @@ The target of this install guide is to run the AI-VSLAM application on the RZ / 
 Before running this application, it is necessary to calibrate the camera according to "SoCDD-08571-01_RZV2H_USBcamera_Calibration".
 If you do not calibrate your camera, the accuracy may be reduced.
 
-## 1. Build Linux Environment
+## Requirements
 ### Deliverables
 
 Refer the link below
@@ -70,7 +70,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   - (5) [Initialize a build using the 'oe-init-build-env' script in Poky](#step1-5)
   - (6) [Add layer Graphics Library, drpai, opencva, etc.](#step1-6)
   - (7) [Change the size of the microSD card image in WIC format](#step1-7)
-  - (8) [Bitbake the Image](#step1-8)
+  - (8) [Bitbake the Image after extracting the OSS package](#step1-8)
   - (9) [Add SLAM recipe](#step1-9)
   - (10) [Bitbake the Image](#step1-10)
   - (11) [Build the target SDK](#step1-11)
@@ -96,7 +96,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   - (21) [Execute Stella-vslam](#step3-4)
   - (22) [Re-build AI-VSLAM application](#step3-5)
 
-## Build Instructions
+## 1. Build Linux Environment
   <img src="./img/img3.png" width="300">
 <a id="step1-1"></a>
 
@@ -247,7 +247,7 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
 
 <a id="step1-8"></a>
 
-### (8) Run the following commands to extract the OSS package
+### (8) Bitbake the Image after extracting the OSS package
   ```
   cp ${WORK}/src_setup/oss_pkg_rzv_*.7z ${YOCTO_WORK}
   7z x ${YOCTO_WORK}/oss_pkg_rzv_*.7z -o${YOCTO_WORK}/build
@@ -1087,6 +1087,9 @@ If calibrate the USB camera, please refer to the [Calibration guide](calibration
   ```
 
 ## 3. Execute AI-VSLAM Sample Application
+
+<img src="./img/img5.png" width="300">
+
 ### Start board
   ![](./img/img6.png)
 
